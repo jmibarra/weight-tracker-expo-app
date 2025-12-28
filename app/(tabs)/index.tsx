@@ -23,25 +23,35 @@ export default function HomeScreen() {
   const [latest, setLatest] = useState<Measurement | null>(null);
   const [targetWeight, setTargetWeight] = useState<number>(0);
   const [loading, setLoading] = useState(false);
-  const [range, setRange] = useState<'all' | '1Y' | '1M' | '1W'>('all');
+  const [range, setRange] = useState<'all' | '1Y' | '1M' | '1W'>('1W');
 
   // Filter logic
   const getFilteredData = () => {
-      if (range === 'all') return chartData;
+      let filtered = data;
       
-      const now = new Date();
-      let limitDate = new Date();
+      if (range !== 'all') {
+        const now = new Date();
+        let limitDate = new Date();
+        
+        if (range === '1Y') limitDate.setFullYear(now.getFullYear() - 1);
+        if (range === '1M') limitDate.setMonth(now.getMonth() - 1);
+        if (range === '1W') limitDate.setDate(now.getDate() - 7);
+        
+        filtered = data.filter(item => {
+            const itemDate = new Date(item.date);
+            itemDate.setHours(0,0,0,0);
+            limitDate.setHours(0,0,0,0);
+            return itemDate >= limitDate;
+        });
+      }
+
+      // Sampling for large datasets (prevent crash on 'all')
+      if (filtered.length > 50) {
+          const step = Math.ceil(filtered.length / 50);
+          filtered = filtered.filter((_, index) => index % step === 0 || index === filtered.length - 1);
+      }
       
-      if (range === '1Y') limitDate.setFullYear(now.getFullYear() - 1);
-      if (range === '1M') limitDate.setMonth(now.getMonth() - 1);
-      if (range === '1W') limitDate.setDate(now.getDate() - 7);
-      
-      return data.filter(item => {
-          const itemDate = new Date(item.date);
-          itemDate.setHours(0,0,0,0);
-          limitDate.setHours(0,0,0,0);
-          return itemDate >= limitDate;
-      }).map(m => ({
+      return filtered.map(m => ({
             value: m.weight,
             label: m.date.slice(5),
             dataPointText: m.weight.toString(),
@@ -114,7 +124,14 @@ export default function HomeScreen() {
         
         <Card style={styles.chartCard}>
             <Text style={cardTitleStyle}>{t.home.trend}</Text>
-            <WeightChart data={filteredChartData} targetWeight={targetWeight > 0 ? targetWeight : undefined} />
+            
+            {filteredChartData.length > 0 ? (
+                 <WeightChart data={filteredChartData} targetWeight={targetWeight > 0 ? targetWeight : undefined} />
+            ) : (
+                <View style={{ height: 200, justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                    <Text style={{ color: colors.textSecondary }}>{t.home.noChartData}</Text>
+                </View>
+            )}
             
             <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 10, marginTop: 10 }}>
                 {(['all', '1Y', '1M', '1W'] as const).map(r => (

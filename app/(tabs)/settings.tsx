@@ -1,9 +1,9 @@
 import * as DocumentPicker from 'expo-document-picker';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { useRouter } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import React from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
@@ -21,7 +21,7 @@ export default function OptionsScreen() {
     const handleImportCsv = async () => {
         try {
             const result = await DocumentPicker.getDocumentAsync({
-                type: 'text/comma-separated-values',
+                type: '*/*', // Allow all files to avoid OS-specific MIME type issues
                 copyToCacheDirectory: true
             });
 
@@ -40,36 +40,61 @@ export default function OptionsScreen() {
                 line = line.trim();
                 if (!line) continue;
                 
-                const parts = line.split(',');
-                if (parts.length < 2) continue; // Minimum date and weight
+                // Parse CSV line respecting quotes
+                // Regex matches: "quoted string" OR value without comma
+                const parts: string[] = [];
+                let current = '';
+                let inQuote = false;
                 
-                // Check if header
-                if (parts[0].toLowerCase().includes('date') || parts[0].toLowerCase().includes('fecha')) continue;
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    if (char === '"') {
+                        inQuote = !inQuote;
+                    } else if (char === ',' && !inQuote) {
+                        parts.push(current);
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                parts.push(current);
 
-                const date = parts[0];
-                const weight = parseFloat(parts[1]);
-                const waist = parts[2] ? parseFloat(parts[2]) : undefined;
-                const hip = parts[3] ? parseFloat(parts[3]) : undefined;
-                const legs = parts[4] ? parseFloat(parts[4]) : undefined;
+                if (parts.length < 2) continue;
                 
+                // Check header
+                if (parts[0].toLowerCase().includes('fecha') || parts[0].toLowerCase().includes('date')) continue;
+
+                // Parse Date: 15/06/2016 -> YYYY-MM-DD
+                const dateParts = parts[0].split('/');
+                if (dateParts.length !== 3) continue;
+                const date = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`; // ISO format for DB
+
+                // Parse Weight: "117,5" -> 117.5
+                let weightStr = parts[1].replace(/"/g, '').replace(',', '.');
+                const weight = parseFloat(weightStr);
+
+                // Optional BMI
+                let bmi = 0;
+                if (parts[3]) {
+                     let bmiStr = parts[3].replace(/"/g, '').replace(',', '.');
+                     bmi = parseFloat(bmiStr) || 0;
+                }
+
                 if (isNaN(weight)) continue;
 
                 await repo.addMeasurement({
                     date,
                     weight,
-                    waist,
-                    hip,
-                    legs,
-                    bmi: 0 // Recalc? Or leave 0. 
+                    bmi
                 });
                 count++;
             }
             
             Alert.alert(t.settings.importSuccess, `${t.common.success}: ${count} ${t.settings.recordsImported}`);
 
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
-            Alert.alert(t.common.error, t.settings.importError);
+            Alert.alert(t.common.error, `${t.settings.importError}: ${e.message}`);
         }
     };
 
@@ -139,6 +164,22 @@ export default function OptionsScreen() {
                     <Text style={textStyle}>
                         {t.settings.importCsvDesc}
                     </Text>
+                    
+                    <View style={{ 
+                        marginTop: 12, 
+                        padding: 12, 
+                        backgroundColor: colors.surfaceHighlight, 
+                        borderRadius: 8,
+                        borderLeftWidth: 3,
+                        borderLeftColor: colors.primary 
+                    }}>
+                        <Text style={[textStyle, { fontSize: 13, fontWeight: '600', marginBottom: 4 }]}>{t.settings.csvFormatTitle}</Text>
+                        <Text style={[textStyle, { fontSize: 12, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>
+                            Fecha,Peso,Cambio,IMC{'\n'}
+                            15/06/2016,"117,5",,"35,1"
+                        </Text>
+                    </View>
+
                     <Button 
                         title={t.settings.importCsv} 
                         onPress={handleImportCsv} 

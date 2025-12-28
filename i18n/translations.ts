@@ -19,6 +19,7 @@ export const translations = {
       progress: 'Total Change',
       maxWeight: 'Max Weight',
       minWeight: 'Min Weight',
+      noChartData: 'No records for this period.',
       tabTitle: 'Home'
     },
     history: {
@@ -42,7 +43,8 @@ export const translations = {
       title: 'Options',
       dataManagement: 'Data Management',
       importCsv: 'Import CSV',
-      importCsvDesc: 'Import your history from a CSV file.\nFormat: date (YYYY-MM-DD), weight, waist, hip, legs',
+      importCsvDesc: 'Import your history from a file.',
+      csvFormatTitle: 'Expected Format:',
       about: 'About',
       desc: 'Weight Tracker v1.0\nDeveloped with Expo & SQLite.',
       importSuccess: 'Import Successful',
@@ -94,6 +96,7 @@ export const translations = {
       progress: 'Cambio Total',
       maxWeight: 'Peso Máximo',
       minWeight: 'Peso Mínimo',
+      noChartData: 'No hay registros para este periodo.',
       tabTitle: 'Inicio'
     },
     history: {
@@ -117,7 +120,8 @@ export const translations = {
       title: 'Opciones',
       dataManagement: 'Gestión de Datos',
       importCsv: 'Importar CSV',
-      importCsvDesc: 'Importa tu historial desde un archivo CSV.\nFormato: fecha (YYYY-MM-DD), peso, cintura, cadera, piernas',
+      importCsvDesc: 'Importa tu historial desde un archivo.',
+      csvFormatTitle: 'Formato Esperado:',
       about: 'Acerca de',
       desc: 'Weight Tracker v1.0\nDesarrollado con Expo y SQLite.',
       importSuccess: 'Importación Exitosa',
