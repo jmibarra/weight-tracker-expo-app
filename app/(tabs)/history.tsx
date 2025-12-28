@@ -42,28 +42,53 @@ export default function HistoryScreen() {
   const weightStyle = { color: colors.primary, ...styles.weight };
   const subtextStyle = { color: colors.textSecondary, ...styles.subtext };
 
-  const renderItem = ({ item }: { item: Measurement }) => (
-    <TouchableOpacity onPress={() => router.push({ pathname: '/modal', params: { id: item.id } })}>
-    <Card style={styles.itemCard}>
-        <View style={styles.row}>
-            <View>
-                <Text style={dateStyle}>{item.date}</Text>
-                {item.bmi ? <Text style={subtextStyle}>{t.home.bmi}: {item.bmi}</Text> : null}
+  const renderItem = ({ item, index }: { item: Measurement; index: number }) => {
+    const prevItem = data[index + 1];
+    let diffText = null;
+    let diffColor = colors.textSecondary;
+
+    if (prevItem) {
+        const diff = item.weight - prevItem.weight;
+        if (Math.abs(diff) > 0) { // Show if there is any difference
+            const sign = diff > 0 ? '+' : '';
+            diffText = `${sign}${diff.toFixed(1)} kg`;
+            diffColor = diff > 0 ? colors.error : colors.success;
+        } else {
+             diffText = '0.0 kg';
+             diffColor = colors.textSecondary;
+        }
+    }
+
+    return (
+        <TouchableOpacity onPress={() => router.push({ pathname: '/modal', params: { id: item.id } })}>
+        <Card style={styles.itemCard}>
+            <View style={styles.row}>
+                <View>
+                    <Text style={dateStyle}>{item.date}</Text>
+                    {item.bmi ? <Text style={subtextStyle}>{t.home.bmi}: {item.bmi}</Text> : null}
+                </View>
+                <View style={{alignItems: 'flex-end'}}>
+                    <Text style={weightStyle}>{item.weight} kg</Text>
+                    
+                    {diffText && (
+                         <Text style={{ color: diffColor, fontSize: 12, fontWeight: '600', marginBottom: 2 }}>
+                            {diffText}
+                         </Text>
+                    )}
+
+                    <Text style={subtextStyle}>
+                        {[
+                            item.waist ? `W:${item.waist}` : '',
+                            item.hip ? `H:${item.hip}` : '',
+                            item.legs ? `L:${item.legs}` : ''
+                        ].filter(Boolean).join(' | ')}
+                    </Text>
+                </View>
             </View>
-            <View style={{alignItems: 'flex-end'}}>
-                <Text style={weightStyle}>{item.weight} kg</Text>
-                <Text style={subtextStyle}>
-                    {[
-                        item.waist ? `W:${item.waist}` : '',
-                        item.hip ? `H:${item.hip}` : '',
-                        item.legs ? `L:${item.legs}` : ''
-                    ].filter(Boolean).join(' | ')}
-                </Text>
-            </View>
-        </View>
-    </Card>
-    </TouchableOpacity>
-  );
+        </Card>
+        </TouchableOpacity>
+    );
+  };
 
   const containerStyle = { flex: 1, backgroundColor: colors.background };
   const titleStyle = { color: colors.text, ...styles.title };
