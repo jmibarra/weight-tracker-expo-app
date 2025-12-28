@@ -15,6 +15,10 @@ export const translations = {
         month: '1M',
         week: '1W'
       },
+      startWeight: 'Start Weight',
+      progress: 'Total Change',
+      maxWeight: 'Max Weight',
+      minWeight: 'Min Weight',
       tabTitle: 'Home'
     },
     history: {
@@ -86,6 +90,10 @@ export const translations = {
         month: '1M',
         week: '1S'
       },
+      startWeight: 'Peso Inicial',
+      progress: 'Cambio Total',
+      maxWeight: 'Peso Máximo',
+      minWeight: 'Peso Mínimo',
       tabTitle: 'Inicio'
     },
     history: {

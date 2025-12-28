@@ -175,6 +175,43 @@ export default function HomeScreen() {
                         </Card>
                     </View>
                 )}
+
+                {data.length > 0 && (
+                    <View>
+                        <View style={styles.statsRow}>
+                            <Card style={styles.statCard}>
+                                <Text style={statLabelStyle}>{t.home.startWeight}</Text>
+                                <Text style={statValueStyle}>{data[0].weight} <Text style={unitStyle}>kg</Text></Text>
+                            </Card>
+                            <Card style={styles.statCard}>
+                                <Text style={statLabelStyle}>{t.home.progress}</Text>
+                                <Text style={[styles.statValue, { color: (latest.weight - data[0].weight) > 0 ? colors.error : colors.success }]}>
+                                    {(latest.weight - data[0].weight).toFixed(1)} <Text style={unitStyle}>kg</Text>
+                                </Text>
+                            </Card>
+                        </View>
+                        
+                        {(() => {
+                             const maxRecord = data.reduce((prev, current) => (prev.weight > current.weight) ? prev : current, data[0]);
+                             const minRecord = data.reduce((prev, current) => (prev.weight < current.weight) ? prev : current, data[0]);
+                             
+                             return (
+                                <View style={styles.statsRow}>
+                                    <Card style={styles.statCard}>
+                                        <Text style={statLabelStyle}>{t.home.maxWeight}</Text>
+                                        <Text style={statValueStyle}>{maxRecord.weight} <Text style={unitStyle}>kg</Text></Text>
+                                        <Text style={{ fontSize: 10, color: colors.textSecondary, marginTop: 4 }}>{maxRecord.date}</Text>
+                                    </Card>
+                                    <Card style={styles.statCard}>
+                                        <Text style={statLabelStyle}>{t.home.minWeight}</Text>
+                                        <Text style={statValueStyle}>{minRecord.weight} <Text style={unitStyle}>kg</Text></Text>
+                                        <Text style={{ fontSize: 10, color: colors.textSecondary, marginTop: 4 }}>{minRecord.date}</Text>
+                                    </Card>
+                                </View>
+                             );
+                        })()}
+                    </View>
+                )}
             </View>
         )}
 
