@@ -1,7 +1,7 @@
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import React, { useCallback, useState } from 'react';
-import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Card } from '@/components/ui/Card';
@@ -11,6 +11,7 @@ import { useI18n } from '@/i18n/I18nContext';
 
 export default function HistoryScreen() {
   const db = useSQLiteContext();
+  const router = useRouter();
   const { t } = useI18n();
   const [data, setData] = useState<Measurement[]>([]);
   const [loading, setLoading] = useState(false);
@@ -35,6 +36,7 @@ export default function HistoryScreen() {
   );
 
   const renderItem = ({ item }: { item: Measurement }) => (
+    <TouchableOpacity onPress={() => router.push({ pathname: '/modal', params: { id: item.id } })}>
     <Card style={styles.itemCard}>
         <View style={styles.row}>
             <View>
@@ -53,6 +55,7 @@ export default function HistoryScreen() {
             </View>
         </View>
     </Card>
+    </TouchableOpacity>
   );
 
   return (

@@ -41,15 +41,19 @@ export const translations = {
     },
     addEntry: {
       title: 'New Entry',
+      editTitle: 'Edit Entry',
       weight: 'Weight (kg) *',
       waist: 'Waist (cm)',
       hip: 'Hip (cm)',
       legs: 'Legs (cm)',
       date: 'Date',
       save: 'Save Entry',
+      update: 'Update Entry',
+      delete: 'Delete Entry',
       cancel: 'Cancel',
       validationWeight: 'Weight is required',
-      error: 'Failed to save entry'
+      error: 'Failed to save entry',
+      confirmDelete: 'Are you sure you want to delete this entry?',
     },
     common: {
         error: 'Error',
@@ -98,15 +102,19 @@ export const translations = {
     },
     addEntry: {
       title: 'Nueva Entrada',
+      editTitle: 'Editar Entrada',
       weight: 'Peso (kg) *',
       waist: 'Cintura (cm)',
       hip: 'Cadera (cm)',
       legs: 'Piernas (cm)',
       date: 'Fecha',
       save: 'Guardar',
+      update: 'Actualizar',
+      delete: 'Eliminar',
       cancel: 'Cancelar',
       validationWeight: 'El peso es obligatorio',
-      error: 'Error al guardar la entrada'
+      error: 'Error al guardar la entrada',
+      confirmDelete: '¿Estás seguro de que quieres eliminar esta entrada?',
     },
     common: {
         error: 'Error',

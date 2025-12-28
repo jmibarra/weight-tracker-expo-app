@@ -1,5 +1,5 @@
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
@@ -16,32 +16,47 @@ import { ImcCalculator } from '@/services/ImcCalculator';
 export default function ModalScreen() {
   const db = useSQLiteContext();
   const router = useRouter();
+  const params = useLocalSearchParams();
   const { t } = useI18n();
   
   const [weight, setWeight] = useState('');
   const [waist, setWaist] = useState('');
   const [hip, setHip] = useState('');
   const [legs, setLegs] = useState('');
-  // Date state
+  
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [userHeight, setUserHeight] = useState<number | null>(null);
+  const [editId, setEditId] = useState<number | null>(null);
 
   useEffect(() => {
-    // Load height for BMI calc
-    const loadHeight = async () => {
+    const loadData = async () => {
         try {
             const settingsRepo = new SettingsRepository(db);
             const h = await settingsRepo.getSetting('height');
             if (h) setUserHeight(parseFloat(h));
+
+            if (params.id) {
+                const id = parseInt(params.id as string);
+                setEditId(id);
+                const measurementsRepo = new MeasurementsRepository(db);
+                const m = await measurementsRepo.getMeasurementById(id);
+                if (m) {
+                    setWeight(m.weight.toString());
+                    setWaist(m.waist ? m.waist.toString() : '');
+                    setHip(m.hip ? m.hip.toString() : '');
+                    setLegs(m.legs ? m.legs.toString() : '');
+                    setDate(new Date(m.date)); // Assuming YYYY-MM-DD works with Date constructor, usually yes for ISO
+                }
+            }
         } catch (e) {
             console.error(e);
         }
     }
-    loadHeight();
-  }, []);
+    loadData();
+  }, [params.id]);
 
   const formatDate = (d: Date) => {
     return d.toISOString().split('T')[0];
@@ -53,6 +68,30 @@ export default function ModalScreen() {
         setDate(selectedDate);
     }
   };
+
+  const handleDelete = async () => {
+      if (!editId) return;
+
+      Alert.alert(
+          t.addEntry.delete, 
+          t.addEntry.confirmDelete,
+          [
+              { text: t.addEntry.cancel, style: 'cancel' },
+              { text: t.addEntry.delete, style: 'destructive', onPress: async () => {
+                   try {
+                        setLoading(true);
+                        const repo = new MeasurementsRepository(db);
+                        await repo.deleteMeasurement(editId);
+                        router.back();
+                   } catch(e) {
+                       Alert.alert(t.common.error, String(e));
+                   } finally {
+                       setLoading(false);
+                   }
+              }}
+          ]
+      );
+  }
 
   const handleSave = async () => {
     if (!weight) {
@@ -69,16 +108,21 @@ export default function ModalScreen() {
             bmi = ImcCalculator.calculate(parseFloat(weight), userHeight);
         }
 
-        await repo.addMeasurement({
+        const data = {
             date: formatDate(date),
             weight: parseFloat(weight),
             waist: waist ? parseFloat(waist) : undefined,
             hip: hip ? parseFloat(hip) : undefined,
             legs: legs ? parseFloat(legs) : undefined,
             bmi
-        });
+        };
 
-        // Use router.back() to close modal
+        if (editId) {
+            await repo.updateMeasurement({ ...data, id: editId });
+        } else {
+            await repo.addMeasurement(data);
+        }
+
         router.back();
     } catch (e) {
         console.error(e);
@@ -96,7 +140,7 @@ export default function ModalScreen() {
         style={styles.keyboardView}
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          <Text style={styles.title}>{t.addEntry.title}</Text>
+          <Text style={styles.title}>{editId ? t.addEntry.editTitle : t.addEntry.title}</Text>
           <Text style={styles.subtitle}>{formatDate(date)}</Text>
           
           <View style={styles.form}>
@@ -106,14 +150,14 @@ export default function ModalScreen() {
               keyboardType="numeric"
               value={weight}
               onChangeText={setWeight}
-              autoFocus
+              autoFocus={!editId}
             />
             
             <View style={styles.row}>
                 <View style={{flex: 1, marginRight: 8}}>
                     <Input
                         label={t.addEntry.waist}
-                        placeholder={t.home.addEntry} // using generic placeholder logic or optional
+                        placeholder="" 
                         keyboardType="numeric"
                         value={waist}
                         onChangeText={setWaist}
@@ -138,7 +182,6 @@ export default function ModalScreen() {
               onChangeText={setLegs}
             />
              
-             {/* Date Picker Trigger */}
             <View style={styles.dateContainer}>
                 <Text style={styles.dateLabel}>{t.addEntry.date}</Text>
                 <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateButton}>
@@ -157,11 +200,21 @@ export default function ModalScreen() {
             )}
 
             <Button 
-              title={t.addEntry.save} 
+              title={editId ? t.addEntry.update : t.addEntry.save} 
               onPress={handleSave} 
               loading={loading}
               style={{ marginTop: 24 }}
             />
+
+            {editId && (
+                 <Button 
+                    title={t.addEntry.delete} 
+                    variant="outline"
+                    onPress={handleDelete} 
+                    style={{ marginTop: 16, borderColor: Colors.dark.error }}
+                    textStyle={{ color: Colors.dark.error }}
+                />
+            )}
             
             <Button 
                 title={t.addEntry.cancel} 

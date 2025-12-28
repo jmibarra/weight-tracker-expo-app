@@ -44,4 +44,23 @@ export class MeasurementsRepository {
     async deleteAll() {
         await this.db.runAsync('DELETE FROM measurements');
     }
+
+    async deleteMeasurement(id: number) {
+        await this.db.runAsync('DELETE FROM measurements WHERE id = ?', [id]);
+    }
+
+    async getMeasurementById(id: number): Promise<Measurement | null> {
+        return await this.db.getFirstAsync<Measurement>(
+            `SELECT * FROM measurements WHERE id = ?`, [id]
+        );
+    }
+
+    async updateMeasurement(measurement: Measurement) {
+        if (!measurement.id) throw new Error('ID required for update');
+        const { id, date, weight, waist, hip, legs, bmi } = measurement;
+        await this.db.runAsync(
+            `UPDATE measurements SET date = ?, weight = ?, waist = ?, hip = ?, legs = ?, bmi = ? WHERE id = ?`,
+            [date, weight, waist ?? null, hip ?? null, legs ?? null, bmi ?? null, id]
+        );
+    }
 }
