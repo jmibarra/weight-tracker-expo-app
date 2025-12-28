@@ -1,50 +1,106 @@
-# Welcome to your Expo app 👋
+# ⚖️ Weight Tracker App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Una aplicación simple y elegante para el seguimiento de tu peso corporal, construida con React Native y Expo.
 
-## Get started
+## ✨ Funcionalidades
 
-1. Install dependencies
+- **Registro Diario**: Guarda tu peso y calculamos automáticamente tu IMC (Índice de Masa Corporal).
+- **Visualización de Progreso**: Gráficos interactivos para ver tu evolución en el tiempo:
+  - Vistas por Semana, Mes, Año o Histórico completo.
+  - _Optimización_: La vista histórica utiliza muestreo inteligente para mostrar grandes volúmenes de datos con fluidez.
+- **Estadísticas Clave**:
+  - Peso Actual vs Peso Inicial.
+  - Peso Máximo y Mínimo histórico.
+  - Progreso total (diferencia de peso).
+- **Importación de Datos**:
+  - Importa tu historial existente desde archivos CSV.
+  - Soporte formato robusto incluyendo fechas y valores citados.
+- **Personalización**:
+  - Modo Oscuro / Claro (Theme Aware).
+  - Soporte multi-idioma (Español / Inglés).
+  - Configuración de Peso Objetivo.
 
-   ```bash
-   npm install
-   ```
+## 📸 Capturas de Pantalla
 
-2. Start the app
+|            Inicio            |          Histórico           |         Importar CSV         |
+| :--------------------------: | :--------------------------: | :--------------------------: |
+| <!-- Agrega captura aquí --> | <!-- Agrega captura aquí --> | <!-- Agrega captura aquí --> |
 
-   ```bash
-   npx expo start
-   ```
+_(Espacio reservado para agregar capturas de pantalla de la aplicación)_
 
-In the output, you'll find options to open the app in a
+## 🚀 Cómo correr la App localmente
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Sigue estos pasos para ejecutar el proyecto en tu máquina:
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+1.  **Prerrequisitos**:
 
-## Get a fresh project
+    - Tener instalado [Node.js](https://nodejs.org/) (LTS recomendado).
+    - Tener instalado `git`.
 
-When you're ready, run:
+2.  **Clonar el repositorio**:
 
-```bash
-npm run reset-project
-```
+    ```bash
+    git clone https://github.com/jmibarra/weight-tracker-expo-app.git
+    cd weight-tracker-expo-app
+    ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+3.  **Instalar dependencias**:
 
-## Learn more
+    ```bash
+    npm install
+    ```
 
-To learn more about developing your project with Expo, look at the following resources:
+4.  **Iniciar la aplicación**:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+    ```bash
+    npx expo start
+    ```
 
-## Join the community
+5.  **Ejecutar en tu dispositivo**:
+    - **Físico**: Descarga la app **Expo Go** (Play Store / App Store) y escanea el código QR que muestra la terminal.
+    - **Emulador**: Presiona `a` para Android o `i` para iOS (requiere configuración previa de Android Studio / Xcode).
 
-Join our community of developers creating universal apps.
+## 📱 Descargar APK
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Puedes descargar la última versión compilada (APK para Android) directamente desde la sección de **Releases** de este repositorio:
+
+👉 [**Ir a Releases y Descargar**](https://github.com/jmibarra/weight-tracker-expo-app/releases)
+
+---
+
+## 🐞 Reporta un Problema
+
+Si encuentras algún error o tienes una idea para mejorar el libro, abre un **Issue** en nuestro [tablero de Issues](https://github.com/jmibarra/weight-tracker-expo-app/issues). Por favor, incluye detalles claros y pasos para reproducir el problema si corresponde.
+
+---
+
+## 🤝 Contribución
+
+¡Las contribuciones son bienvenidas! Si tienes ideas para nuevas funcionalidades, mejoras de rendimiento o correcciones de errores, me encantaría que colaboraras.
+
+### Proceso de Colaboración (Pull Requests)
+
+1.  **Haz un _Fork_** del repositorio.
+2.  **Crea una rama** para tu funcionalidad o corrección (`git checkout -b feature/MiNuevaMejora`).
+3.  **Realiza tus cambios** y haz _commit_ con un mensaje descriptivo.
+4.  **Sube tu rama** a tu _fork_ (`git push origin feature/MiNuevaMejora`).
+5.  **Abre un _Pull Request_** (PR) detallando los cambios que has realizado y por qué son necesarios.
+
+---
+
+## 📬 Comunícate
+
+Si tienes dudas o necesitas orientación, no dudes en contactarnos a través de los Issues o mail:  
+✉️ [jmibarra86@gmail.com](mailto:jmibarra86@gmail.com)
+
+También puedes encontrarme en LinkedIn:  
+🔗 [Juan Manuel Ibarra - LinkedIn](https://www.linkedin.com/in/juan-manuel-ibarra-activity/)
+
+---
+
+**¡Gracias por contribuir a mejorar esta herramienta!** 🌟  
+Juntos podemos construir un recurso útil y abierto para la comunidad. 🙌
+
+Si te gusta este proyecto y querés apoyar su desarrollo:
+
+[![Invitame un café en cafecito.app](https://cdn.cafecito.app/imgs/buttons/button_1.svg)](https://cafecito.app/jmibarradev)
