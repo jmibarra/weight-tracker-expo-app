@@ -1,6 +1,6 @@
 import { Tabs, useRouter } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, View } from 'react-native';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
@@ -59,12 +59,21 @@ export default function TabLayout() {
         options={{
           title: '', // No title
           tabBarIcon: ({ color, focused }) => (
-            <IconSymbol 
-                size={48} 
-                name="plus.circle.fill" 
-                color={Colors.dark.primary} 
-                style={{ marginBottom: -10 }}
-            />
+            <View style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: 56,
+              width: 56,
+              marginTop: -20, // Lift it up slightly to float
+              backgroundColor: Colors.dark.surface,
+              borderRadius: 28,
+            }}>
+              <IconSymbol 
+                  size={48} 
+                  name="plus.circle.fill" 
+                  color={Colors.dark.primary} 
+              />
+            </View>
           ),
         }}
       />
