@@ -6,6 +6,7 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 import { migrateDbIfNeeded } from '@/db/database';
+import { I18nProvider } from '@/i18n/I18nContext';
 import { SQLiteProvider } from 'expo-sqlite';
 
 export const unstable_settings = {
@@ -17,13 +18,15 @@ export default function RootLayout() {
 
   return (
     <SQLiteProvider databaseName="weight_tracker.db" onInit={migrateDbIfNeeded} useSuspense>
+      <I18nProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Add Entry' }} />
+          <Stack.Screen name="modal" options={{ presentation: 'modal', headerShown: false }} />
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>
+      </I18nProvider>
     </SQLiteProvider>
   );
 }

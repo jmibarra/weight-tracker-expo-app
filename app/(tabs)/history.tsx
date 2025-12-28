@@ -7,9 +7,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Card } from '@/components/ui/Card';
 import { Colors } from '@/constants/Colors';
 import { Measurement, MeasurementsRepository } from '@/db/repositories/MeasurementsRepository';
+import { useI18n } from '@/i18n/I18nContext';
 
 export default function HistoryScreen() {
   const db = useSQLiteContext();
+  const { t } = useI18n();
   const [data, setData] = useState<Measurement[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -37,7 +39,7 @@ export default function HistoryScreen() {
         <View style={styles.row}>
             <View>
                 <Text style={styles.date}>{item.date}</Text>
-                {item.bmi ? <Text style={styles.subtext}>BMI: {item.bmi}</Text> : null}
+                {item.bmi ? <Text style={styles.subtext}>{t.home.bmi}: {item.bmi}</Text> : null}
             </View>
             <View style={{alignItems: 'flex-end'}}>
                 <Text style={styles.weight}>{item.weight} kg</Text>
@@ -55,14 +57,14 @@ export default function HistoryScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <Text style={styles.title}>History</Text>
+      <Text style={styles.title}>{t.history.title}</Text>
       <FlatList
         data={data}
         keyExtractor={item => item.id?.toString() || Math.random().toString()}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
         refreshControl={<RefreshControl refreshing={loading} onRefresh={loadData} tintColor={Colors.dark.primary}/>}
-        ListEmptyComponent={<Text style={styles.empty}>No history available.</Text>}
+        ListEmptyComponent={<Text style={styles.empty}>{t.history.empty}</Text>}
       />
     </SafeAreaView>
   );

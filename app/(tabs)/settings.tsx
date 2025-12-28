@@ -3,17 +3,19 @@ import * as FileSystem from 'expo-file-system';
 import { useRouter } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import React from 'react';
-import { Alert, ScrollView, StyleSheet, Text } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Colors } from '@/constants/Colors';
 import { MeasurementsRepository } from '@/db/repositories/MeasurementsRepository';
+import { useI18n } from '@/i18n/I18nContext';
 
 export default function OptionsScreen() {
     const router = useRouter();
     const db = useSQLiteContext();
+    const { t, locale, setLocale } = useI18n();
 
     const handleImportCsv = async () => {
         try {
@@ -32,8 +34,6 @@ export default function OptionsScreen() {
             const repo = new MeasurementsRepository(db);
             
             let count = 0;
-            // Assuming header: date,weight,waist,hip,legs
-            // Skip header if present? Let's try to detect or just assume NO header or handle parsing
             
             for (let line of lines) {
                 line = line.trim();
@@ -64,26 +64,44 @@ export default function OptionsScreen() {
                 count++;
             }
             
-            Alert.alert('Import Successful', `Imported ${count} records.`);
+            Alert.alert(t.settings.importSuccess, `${t.common.success}: ${count} ${t.settings.recordsImported}`);
 
         } catch (e) {
             console.error(e);
-            Alert.alert('Error', 'Failed to import CSV');
+            Alert.alert(t.common.error, t.settings.importError);
         }
+    };
+
+    const toggleLanguage = () => {
+        setLocale(locale === 'en' ? 'es' : 'en');
     };
 
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
-            <Text style={styles.title}>Options</Text>
+            <Text style={styles.title}>{t.settings.title}</Text>
             <ScrollView contentContainerStyle={styles.content}>
+                
                 <Card>
-                    <Text style={styles.sectionTitle}>Data Management</Text>
+                    <Text style={styles.sectionTitle}>{t.settings.language}</Text>
+                     <View style={styles.langRow}>
+                        <TouchableOpacity onPress={toggleLanguage} style={styles.langButton}>
+                            <Text style={styles.langText}>
+                                {locale === 'en' ? '🇺🇸 English' : '🇪🇸 Español'}
+                            </Text>
+                        </TouchableOpacity>
+                        <Text style={styles.subtext}>
+                            {t.settings.selectLanguage}
+                        </Text>
+                     </View>
+                </Card>
+
+                <Card>
+                    <Text style={styles.sectionTitle}>{t.settings.dataManagement}</Text>
                     <Text style={styles.text}>
-                        Import your history from a CSV file. {'\n'}
-                        Format: date (YYYY-MM-DD), weight, waist, hip, legs
+                        {t.settings.importCsvDesc}
                     </Text>
                     <Button 
-                        title="Import CSV" 
+                        title={t.settings.importCsv} 
                         onPress={handleImportCsv} 
                         variant="secondary"
                         style={{marginTop: 16}}
@@ -91,10 +109,9 @@ export default function OptionsScreen() {
                 </Card>
 
                  <Card>
-                    <Text style={styles.sectionTitle}>About</Text>
+                    <Text style={styles.sectionTitle}>{t.settings.about}</Text>
                     <Text style={styles.text}>
-                        Weight Tracker v1.0{'\n'}
-                        Developed with Expo & SQLite.
+                         {t.settings.desc}
                     </Text>
                 </Card>
             </ScrollView>
@@ -126,5 +143,24 @@ const styles = StyleSheet.create({
   text: {
     color: Colors.dark.textSecondary,
     lineHeight: 22,
+  },
+  langRow: {
+    alignItems: 'flex-start',
+  },
+  langButton: {
+    backgroundColor: Colors.dark.surfaceHighlight,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  langText: {
+    color: Colors.dark.text,
+    fontSize: 16,
+    fontWeight: '500'
+  },
+  subtext: {
+      color: Colors.dark.textSecondary,
+      fontSize: 12
   }
 });

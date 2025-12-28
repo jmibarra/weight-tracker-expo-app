@@ -8,10 +8,13 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Colors } from '@/constants/Colors';
 import { SettingsRepository } from '@/db/repositories/SettingsRepository';
+import { useI18n } from '@/i18n/I18nContext';
 
 export default function ProfileScreen() {
   const db = useSQLiteContext();
   const router = useRouter();
+  const { t } = useI18n();
+
   const [height, setHeight] = useState('');
   const [sex, setSex] = useState('');
   const [loading, setLoading] = useState(false);
@@ -35,7 +38,7 @@ export default function ProfileScreen() {
 
   const handleSave = async () => {
     if (!height) {
-        Alert.alert('Error', 'Please enter your height');
+        Alert.alert(t.common.error, t.profile.validationHeight);
         return;
     }
 
@@ -44,9 +47,9 @@ export default function ProfileScreen() {
       const repo = new SettingsRepository(db);
       await repo.setSetting('height', height);
       await repo.setSetting('sex', sex);
-      Alert.alert('Success', 'Profile updated successfully');
+      Alert.alert(t.common.success, t.profile.success);
     } catch (e) {
-      Alert.alert('Error', 'Failed to save profile');
+      Alert.alert(t.common.error, t.profile.error);
       console.error(e);
     } finally {
       setLoading(false);
@@ -60,12 +63,12 @@ export default function ProfileScreen() {
         style={styles.keyboardView}
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          <Text style={styles.title}>Profile</Text>
-          <Text style={styles.subtitle}>Update your personal details for BMI calculation.</Text>
+          <Text style={styles.title}>{t.profile.title}</Text>
+          <Text style={styles.subtitle}>{t.profile.subtitle}</Text>
           
           <View style={styles.form}>
             <Input
-              label="Height (cm)"
+              label={t.profile.height}
               placeholder="e.g. 175"
               keyboardType="numeric"
               value={height}
@@ -74,7 +77,7 @@ export default function ProfileScreen() {
             />
             
             <Input
-              label="Sex (M/F)"
+              label={t.profile.sex}
               placeholder="e.g. M"
               value={sex}
               onChangeText={setSex}
@@ -82,7 +85,7 @@ export default function ProfileScreen() {
             />
 
             <Button 
-              title="Save Profile" 
+              title={t.profile.save} 
               onPress={handleSave} 
               loading={loading}
               style={{ marginTop: 20 }}

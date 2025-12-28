@@ -9,10 +9,13 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Colors } from '@/constants/Colors';
 import { Measurement, MeasurementsRepository } from '@/db/repositories/MeasurementsRepository';
+import { useI18n } from '@/i18n/I18nContext';
 
 export default function HomeScreen() {
   const db = useSQLiteContext();
   const router = useRouter();
+  const { t } = useI18n();
+
   const [data, setData] = useState<Measurement[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [latest, setLatest] = useState<Measurement | null>(null);
@@ -57,21 +60,21 @@ export default function HomeScreen() {
         contentContainerStyle={styles.content}
         refreshControl={<RefreshControl refreshing={loading} onRefresh={loadData} tintColor={Colors.dark.primary}/>}
       >
-        <Text style={styles.headerTitle}>Dashboard</Text>
+        <Text style={styles.headerTitle}>{t.home.title}</Text>
         
         <Card style={styles.chartCard}>
-            <Text style={styles.cardTitle}>Weight Trend</Text>
+            <Text style={styles.cardTitle}>{t.home.trend}</Text>
             <WeightChart data={chartData} />
         </Card>
 
         {latest && (
             <View style={styles.statsRow}>
                 <Card style={styles.statCard}>
-                    <Text style={styles.statLabel}>Current Weight</Text>
+                    <Text style={styles.statLabel}>{t.home.currentWeight}</Text>
                     <Text style={styles.statValue}>{latest.weight} <Text style={styles.unit}>kg</Text></Text>
                 </Card>
                 <Card style={styles.statCard}>
-                    <Text style={styles.statLabel}>BMI</Text>
+                    <Text style={styles.statLabel}>{t.home.bmi}</Text>
                     <Text style={[styles.statValue, { color: getBmiColor(latest.bmi || 0) }]}>
                         {latest.bmi || '--'}
                     </Text>
@@ -80,13 +83,13 @@ export default function HomeScreen() {
         )}
 
         <Button 
-            title="Add New Entry" 
+            title={t.home.addEntry} 
             onPress={() => router.push('/modal')} 
             style={{ marginBottom: 20 }}
         />
         
         {!latest && !loading && (
-             <Text style={styles.emptyText}>No data yet. Add your first entry!</Text>
+             <Text style={styles.emptyText}>{t.home.noData}</Text>
         )}
 
       </ScrollView>
