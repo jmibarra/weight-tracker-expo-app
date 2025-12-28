@@ -1,7 +1,7 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import React, { useCallback, useState } from 'react';
-import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { WeightChart } from '@/components/charts/WeightChart';
@@ -23,6 +23,32 @@ export default function HomeScreen() {
   const [latest, setLatest] = useState<Measurement | null>(null);
   const [targetWeight, setTargetWeight] = useState<number>(0);
   const [loading, setLoading] = useState(false);
+  const [range, setRange] = useState<'all' | '1Y' | '1M' | '1W'>('all');
+
+  // Filter logic
+  const getFilteredData = () => {
+      if (range === 'all') return chartData;
+      
+      const now = new Date();
+      let limitDate = new Date();
+      
+      if (range === '1Y') limitDate.setFullYear(now.getFullYear() - 1);
+      if (range === '1M') limitDate.setMonth(now.getMonth() - 1);
+      if (range === '1W') limitDate.setDate(now.getDate() - 7);
+      
+      return data.filter(item => {
+          const itemDate = new Date(item.date);
+          itemDate.setHours(0,0,0,0);
+          limitDate.setHours(0,0,0,0);
+          return itemDate >= limitDate;
+      }).map(m => ({
+            value: m.weight,
+            label: m.date.slice(5),
+            dataPointText: m.weight.toString(),
+      }));
+  };
+
+  const filteredChartData = getFilteredData();
 
   const loadData = async () => {
     setLoading(true);
@@ -88,7 +114,37 @@ export default function HomeScreen() {
         
         <Card style={styles.chartCard}>
             <Text style={cardTitleStyle}>{t.home.trend}</Text>
-            <WeightChart data={chartData} targetWeight={targetWeight > 0 ? targetWeight : undefined} />
+            <WeightChart data={filteredChartData} targetWeight={targetWeight > 0 ? targetWeight : undefined} />
+            
+            <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 10, marginTop: 10 }}>
+                {(['all', '1Y', '1M', '1W'] as const).map(r => (
+                    <TouchableOpacity 
+                        key={r} 
+                        onPress={() => setRange(r)}
+                        style={{
+                            paddingVertical: 6,
+                            paddingHorizontal: 12,
+                            borderRadius: 20,
+                            backgroundColor: range === r ? colors.primary : 'transparent',
+                            borderWidth: 1,
+                            borderColor: range === r ? colors.primary : colors.border
+                        }}
+                    >
+                        <Text style={{ 
+                            color: range === r ? '#fff' : colors.textSecondary,
+                            fontSize: 12,
+                            fontWeight: '600'
+                        }}>
+                           {{
+                               'all': t.home.ranges.all,
+                               '1Y': t.home.ranges.year,
+                               '1M': t.home.ranges.month,
+                               '1W': t.home.ranges.week
+                           }[r]}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
         </Card>
 
         {latest && (

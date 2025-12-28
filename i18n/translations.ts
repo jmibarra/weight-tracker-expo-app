@@ -9,6 +9,12 @@ export const translations = {
       bmi: 'BMI',
       addEntry: 'Add New Entry',
       noData: 'No data yet. Add your first entry!',
+      ranges: {
+        all: 'All',
+        year: '1Y',
+        month: '1M',
+        week: '1W'
+      },
       tabTitle: 'Home'
     },
     history: {
@@ -73,7 +79,13 @@ export const translations = {
       toGo: 'Faltan',
       bmi: 'IMC',
       addEntry: 'Agregar Entrada',
-      noData: 'Sin datos. ¡Agrega tu primera entrada!',
+      noData: 'Aún no hay datos. ¡Agrega tu primer registro!',
+      ranges: {
+        all: 'Todos',
+        year: '1A',
+        month: '1M',
+        week: '1S'
+      },
       tabTitle: 'Inicio'
     },
     history: {
