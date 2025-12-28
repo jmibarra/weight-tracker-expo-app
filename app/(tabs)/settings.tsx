@@ -8,7 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { Colors } from '@/constants/Colors';
+import { useTheme } from '@/context/ThemeContext';
 import { MeasurementsRepository } from '@/db/repositories/MeasurementsRepository';
 import { useI18n } from '@/i18n/I18nContext';
 
@@ -16,6 +16,7 @@ export default function OptionsScreen() {
     const router = useRouter();
     const db = useSQLiteContext();
     const { t, locale, setLocale } = useI18n();
+    const { theme, setTheme, colors } = useTheme();
 
     const handleImportCsv = async () => {
         try {
@@ -76,28 +77,66 @@ export default function OptionsScreen() {
         setLocale(locale === 'en' ? 'es' : 'en');
     };
 
+    // Dynamic styles
+    const containerStyle = { flex: 1, backgroundColor: colors.background };
+    const titleStyle = { ...styles.title, color: colors.text };
+    const sectionTitleStyle = { ...styles.sectionTitle, color: colors.text };
+    const textStyle = { ...styles.text, color: colors.textSecondary };
+    const buttonStyle = { ...styles.langButton, backgroundColor: colors.surfaceHighlight };
+    const buttonTextStyle = { ...styles.langText, color: colors.text };
+    const subtextStyle = { ...styles.subtext, color: colors.textSecondary };
+
+    const ThemeOption = ({ value, label }: { value: 'light' | 'dark' | 'system', label: string }) => (
+        <TouchableOpacity 
+            style={[
+                styles.themeOption, 
+                { 
+                    backgroundColor: theme === value ? colors.primary : colors.surfaceHighlight,
+                    borderColor: theme === value ? colors.primary : 'transparent'
+                }
+            ]} 
+            onPress={() => setTheme(value)}
+        >
+            <Text style={[
+                styles.themeText, 
+                { color: theme === value ? '#FFFFFF' : colors.text }
+            ]}>
+                {label}
+            </Text>
+        </TouchableOpacity>
+    );
+
     return (
-        <SafeAreaView style={styles.container} edges={['top']}>
-            <Text style={styles.title}>{t.settings.title}</Text>
+        <SafeAreaView style={containerStyle} edges={['top']}>
+            <Text style={titleStyle}>{t.settings.title}</Text>
             <ScrollView contentContainerStyle={styles.content}>
                 
                 <Card>
-                    <Text style={styles.sectionTitle}>{t.settings.language}</Text>
+                    <Text style={sectionTitleStyle}>{t.settings.language}</Text>
                      <View style={styles.langRow}>
-                        <TouchableOpacity onPress={toggleLanguage} style={styles.langButton}>
-                            <Text style={styles.langText}>
+                        <TouchableOpacity onPress={toggleLanguage} style={buttonStyle}>
+                            <Text style={buttonTextStyle}>
                                 {locale === 'en' ? '🇺🇸 English' : '🇪🇸 Español'}
                             </Text>
                         </TouchableOpacity>
-                        <Text style={styles.subtext}>
+                        <Text style={subtextStyle}>
                             {t.settings.selectLanguage}
                         </Text>
                      </View>
                 </Card>
 
                 <Card>
-                    <Text style={styles.sectionTitle}>{t.settings.dataManagement}</Text>
-                    <Text style={styles.text}>
+                    <Text style={sectionTitleStyle}>{t.settings.appearance || "Appearance"}</Text>
+                    <View style={styles.themeRow}>
+                        <ThemeOption value="light" label="Light" />
+                        <ThemeOption value="dark" label="Dark" />
+                        <ThemeOption value="system" label="System" />
+                    </View>
+                </Card>
+
+                <Card>
+                    <Text style={sectionTitleStyle}>{t.settings.dataManagement}</Text>
+                    <Text style={textStyle}>
                         {t.settings.importCsvDesc}
                     </Text>
                     <Button 
@@ -109,8 +148,8 @@ export default function OptionsScreen() {
                 </Card>
 
                  <Card>
-                    <Text style={styles.sectionTitle}>{t.settings.about}</Text>
-                    <Text style={styles.text}>
+                    <Text style={sectionTitleStyle}>{t.settings.about}</Text>
+                    <Text style={textStyle}>
                          {t.settings.desc}
                     </Text>
                 </Card>
@@ -120,47 +159,54 @@ export default function OptionsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.dark.background,
-  },
   content: {
     padding: 24,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: Colors.dark.text,
     marginLeft: 24,
     marginTop: 10,
   },
   sectionTitle: {
     fontSize: 18,
-    color: Colors.dark.text,
     fontWeight: '600',
     marginBottom: 8,
   },
   text: {
-    color: Colors.dark.textSecondary,
     lineHeight: 22,
   },
   langRow: {
     alignItems: 'flex-start',
   },
   langButton: {
-    backgroundColor: Colors.dark.surfaceHighlight,
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 8,
     marginBottom: 8,
   },
   langText: {
-    color: Colors.dark.text,
     fontSize: 16,
     fontWeight: '500'
   },
   subtext: {
-      color: Colors.dark.textSecondary,
       fontSize: 12
+  },
+  themeRow: {
+      flexDirection: 'row',
+      gap: 10,
+      marginTop: 8,
+  },
+  themeOption: {
+      flex: 1,
+      paddingVertical: 10,
+      borderRadius: 8,
+      alignItems: 'center',
+      borderWidth: 1,
+  },
+  themeText: {
+      fontWeight: '600',
+      fontSize: 14,
   }
 });
+

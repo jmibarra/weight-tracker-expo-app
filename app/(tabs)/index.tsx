@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { WeightChart } from '@/components/charts/WeightChart';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { Colors } from '@/constants/Colors';
+import { useTheme } from '@/context/ThemeContext';
 import { Measurement, MeasurementsRepository } from '@/db/repositories/MeasurementsRepository';
 import { useI18n } from '@/i18n/I18nContext';
 
@@ -15,6 +15,7 @@ export default function HomeScreen() {
   const db = useSQLiteContext();
   const router = useRouter();
   const { t } = useI18n();
+  const { colors } = useTheme();
 
   const [data, setData] = useState<Measurement[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
@@ -54,27 +55,43 @@ export default function HomeScreen() {
     }, [])
   );
 
+  const getBmiColor = (bmi: number) => {
+    if (bmi < 18.5) return colors.secondary;
+    if (bmi < 25) return colors.success;
+    if (bmi < 30) return '#FFC107'; // Warning
+    return colors.error;
+  };
+
+  // Dynamic styles
+  const containerStyle = { flex: 1, backgroundColor: colors.background };
+  const headerTitleStyle = { ...styles.headerTitle, color: colors.text };
+  const cardTitleStyle = { ...styles.cardTitle, color: colors.text };
+  const statLabelStyle = { ...styles.statLabel, color: colors.textSecondary };
+  const statValueStyle = { ...styles.statValue, color: colors.text };
+  const unitStyle = { ...styles.unit, color: colors.textSecondary };
+  const emptyTextStyle = { ...styles.emptyText, color: colors.textSecondary };
+
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={containerStyle} edges={['top']}>
       <ScrollView 
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={loadData} tintColor={Colors.dark.primary}/>}
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={loadData} tintColor={colors.primary}/>}
       >
-        <Text style={styles.headerTitle}>{t.home.title}</Text>
+        <Text style={headerTitleStyle}>{t.home.title}</Text>
         
         <Card style={styles.chartCard}>
-            <Text style={styles.cardTitle}>{t.home.trend}</Text>
+            <Text style={cardTitleStyle}>{t.home.trend}</Text>
             <WeightChart data={chartData} />
         </Card>
 
         {latest && (
             <View style={styles.statsRow}>
                 <Card style={styles.statCard}>
-                    <Text style={styles.statLabel}>{t.home.currentWeight}</Text>
-                    <Text style={styles.statValue}>{latest.weight} <Text style={styles.unit}>kg</Text></Text>
+                    <Text style={statLabelStyle}>{t.home.currentWeight}</Text>
+                    <Text style={statValueStyle}>{latest.weight} <Text style={unitStyle}>kg</Text></Text>
                 </Card>
                 <Card style={styles.statCard}>
-                    <Text style={styles.statLabel}>{t.home.bmi}</Text>
+                    <Text style={statLabelStyle}>{t.home.bmi}</Text>
                     <Text style={[styles.statValue, { color: getBmiColor(latest.bmi || 0) }]}>
                         {latest.bmi || '--'}
                     </Text>
@@ -89,7 +106,7 @@ export default function HomeScreen() {
         />
         
         {!latest && !loading && (
-             <Text style={styles.emptyText}>{t.home.noData}</Text>
+             <Text style={emptyTextStyle}>{t.home.noData}</Text>
         )}
 
       </ScrollView>
@@ -97,25 +114,13 @@ export default function HomeScreen() {
   );
 }
 
-function getBmiColor(bmi: number) {
-    if (bmi < 18.5) return Colors.dark.secondary;
-    if (bmi < 25) return Colors.dark.success;
-    if (bmi < 30) return '#FFC107'; // Warning
-    return Colors.dark.error;
-}
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.dark.background,
-  },
   content: {
     padding: 20,
   },
   headerTitle: {
     fontSize: 34,
     fontWeight: 'bold',
-    color: Colors.dark.text,
     marginBottom: 20,
   },
   chartCard: {
@@ -125,7 +130,6 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: Colors.dark.text,
     alignSelf: 'flex-start',
     marginBottom: 16,
   },
@@ -142,21 +146,17 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 14,
-    color: Colors.dark.textSecondary,
     marginBottom: 4,
   },
   statValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: Colors.dark.text,
   },
   unit: {
     fontSize: 14,
-    color: Colors.dark.textSecondary,
     fontWeight: 'normal',
   },
   emptyText: {
-    color: Colors.dark.textSecondary,
     textAlign: 'center',
     marginTop: 20,
   }

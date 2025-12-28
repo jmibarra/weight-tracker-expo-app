@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Colors } from '@/constants/Colors';
+import { useTheme } from '@/context/ThemeContext';
 import { SettingsRepository } from '@/db/repositories/SettingsRepository';
 import { useI18n } from '@/i18n/I18nContext';
 
@@ -14,6 +14,7 @@ export default function ProfileScreen() {
   const db = useSQLiteContext();
   const router = useRouter();
   const { t } = useI18n();
+  const { colors } = useTheme();
 
   const [height, setHeight] = useState('');
   const [sex, setSex] = useState('');
@@ -56,15 +57,19 @@ export default function ProfileScreen() {
     }
   };
 
+  const containerStyle = { flex: 1, backgroundColor: colors.background };
+  const titleStyle = { color: colors.text, ...styles.title };
+  const subtitleStyle = { color: colors.textSecondary, ...styles.subtitle };
+
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={containerStyle} edges={['top']}>
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
         style={styles.keyboardView}
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          <Text style={styles.title}>{t.profile.title}</Text>
-          <Text style={styles.subtitle}>{t.profile.subtitle}</Text>
+          <Text style={titleStyle}>{t.profile.title}</Text>
+          <Text style={subtitleStyle}>{t.profile.subtitle}</Text>
           
           <View style={styles.form}>
             <Input
@@ -98,10 +103,6 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.dark.background,
-  },
   keyboardView: {
     flex: 1,
   },
@@ -111,12 +112,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: Colors.dark.text,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: Colors.dark.textSecondary,
     marginBottom: 32,
   },
   form: {

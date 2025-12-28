@@ -1,10 +1,17 @@
-import { Colors } from '@/constants/Colors';
+import { useTheme } from '@/context/ThemeContext';
 import React from 'react';
 import { StyleSheet, View, ViewProps } from 'react-native';
 
 export const Card = ({ style, children, ...props }: ViewProps) => {
+  const { colors } = useTheme();
+
+  const cardStyle = {
+      backgroundColor: colors.surface,
+      ...styles.card
+  };
+
   return (
-    <View style={[styles.card, style]} {...props}>
+    <View style={[cardStyle, style]} {...props}>
       {children}
     </View>
   );
@@ -12,7 +19,6 @@ export const Card = ({ style, children, ...props }: ViewProps) => {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Colors.dark.surface,
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,

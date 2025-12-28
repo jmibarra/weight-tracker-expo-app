@@ -4,31 +4,30 @@ import { Platform, View } from 'react-native';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTheme } from '@/context/ThemeContext';
 import { useI18n } from '@/i18n/I18nContext';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { colors } = useTheme();
   const router = useRouter();
   const { t } = useI18n();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.dark.secondary,
-        tabBarInactiveTintColor: Colors.dark.textSecondary,
+        tabBarActiveTintColor: colors.secondary,
+        tabBarInactiveTintColor: colors.textSecondary,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarStyle: Platform.select({
           ios: {
             position: 'absolute',
-            backgroundColor: Colors.dark.surface,
-            borderTopColor: Colors.dark.border,
+            backgroundColor: colors.surface,
+            borderTopColor: colors.border,
           },
           default: {
-             backgroundColor: Colors.dark.surface,
-             borderTopColor: Colors.dark.border,
+             backgroundColor: colors.surface,
+             borderTopColor: colors.border,
           },
         }),
       }}>
@@ -65,13 +64,13 @@ export default function TabLayout() {
               height: 56,
               width: 56,
               marginTop: -20, // Lift it up slightly to float
-              backgroundColor: Colors.dark.surface,
+              backgroundColor: colors.surface,
               borderRadius: 28,
             }}>
               <IconSymbol 
                   size={48} 
                   name="plus.circle.fill" 
-                  color={Colors.dark.primary} 
+                  color={colors.primary} 
               />
             </View>
           ),

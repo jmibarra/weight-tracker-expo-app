@@ -37,7 +37,8 @@ export const translations = {
       recordsImported: 'records imported.',
       tabTitle: 'Options',
       language: 'Language',
-      selectLanguage: 'Select Language'
+      selectLanguage: 'Select Language',
+      appearance: 'Appearance'
     },
     addEntry: {
       title: 'New Entry',
@@ -98,7 +99,8 @@ export const translations = {
       recordsImported: 'registros importados.',
       tabTitle: 'Opciones',
       language: 'Idioma',
-      selectLanguage: 'Seleccionar Idioma'
+      selectLanguage: 'Seleccionar Idioma',
+      appearance: 'Apariencia'
     },
     addEntry: {
       title: 'Nueva Entrada',

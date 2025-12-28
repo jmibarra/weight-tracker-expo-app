@@ -1,4 +1,4 @@
-import { Colors } from '@/constants/Colors';
+import { useTheme } from '@/context/ThemeContext';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
 
@@ -12,18 +12,25 @@ interface ButtonProps {
 }
 
 export const Button = ({ onPress, title, variant = 'primary', loading, style, textStyle }: ButtonProps) => {
+  const { colors } = useTheme();
+
   const getBackgroundColor = () => {
-    if (variant === 'primary') return Colors.dark.primary;
-    if (variant === 'secondary') return Colors.dark.surfaceHighlight;
+    if (variant === 'primary') return colors.primary;
+    if (variant === 'secondary') return colors.surfaceHighlight;
     return 'transparent';
   };
 
   const getTextColor = () => {
-    if (variant === 'primary') return '#FFFFFF';
-    if (variant === 'secondary') return Colors.dark.text;
-    if (variant === 'outline') return Colors.dark.primary;
-    return Colors.dark.textSecondary;
+    if (variant === 'primary') return '#FFFFFF'; // Usually primary buttons have white text even in light mode if primary color is dark enough
+    if (variant === 'secondary') return colors.text;
+    if (variant === 'outline') return colors.primary;
+    return colors.textSecondary;
   };
+
+  const dynamicOutlineStyle = variant === 'outline' ? {
+      borderWidth: 1,
+      borderColor: colors.primary
+  } : {};
 
   return (
     <TouchableOpacity
@@ -32,7 +39,7 @@ export const Button = ({ onPress, title, variant = 'primary', loading, style, te
       style={[
         styles.button,
         { backgroundColor: getBackgroundColor() },
-        variant === 'outline' && styles.outline,
+        dynamicOutlineStyle,
         style,
       ]}
     >
@@ -52,10 +59,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  outline: {
-    borderWidth: 1,
-    borderColor: Colors.dark.primary,
   },
   text: {
     fontSize: 16,

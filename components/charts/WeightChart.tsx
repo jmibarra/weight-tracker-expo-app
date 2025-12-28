@@ -1,4 +1,4 @@
-import { Colors } from '@/constants/Colors';
+import { useTheme } from '@/context/ThemeContext';
 import React from 'react';
 import { Dimensions, View } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
@@ -14,6 +14,7 @@ interface WeightChartProps {
 }
 
 export const WeightChart = ({ data }: WeightChartProps) => {
+  const { colors } = useTheme();
   const screenWidth = Dimensions.get('window').width;
 
   if (data.length === 0) {
@@ -24,34 +25,34 @@ export const WeightChart = ({ data }: WeightChartProps) => {
     <View style={{ overflow: 'hidden', paddingBottom: 10 }}>
     <LineChart
       data={data}
-      color={Colors.dark.primary}
+      color={colors.primary}
       thickness={3}
-      dataPointsColor={Colors.dark.secondary}
-      selectionColor={Colors.dark.secondary}
-      startFillColor={Colors.dark.primary}
-      endFillColor={Colors.dark.primary}
+      dataPointsColor={colors.secondary}
+      selectionColor={colors.secondary}
+      startFillColor={colors.primary}
+      endFillColor={colors.primary}
       startOpacity={0.3}
       endOpacity={0.1}
       areaChart
-      yAxisTextStyle={{ color: Colors.dark.textSecondary }}
-      xAxisTextStyle={{ color: Colors.dark.textSecondary, fontSize: 10 }}
+      yAxisTextStyle={{ color: colors.textSecondary }}
+      xAxisTextStyle={{ color: colors.textSecondary, fontSize: 10 }}
       noOfSections={5}
-      rulesColor={Colors.dark.border}
+      rulesColor={colors.border}
       rulesType="solid"
       width={screenWidth - 60} // Padding consideration
       height={250}
       spacing={40}
       initialSpacing={20}
       yAxisColor="transparent"
-      xAxisColor={Colors.dark.border}
+      xAxisColor={colors.border}
       textFontSize={12}
-      textColor={Colors.dark.text}
+      textColor={colors.text}
       hideDataPoints={false}
       pointerConfig={{
         pointerStripHeight: 160,
-        pointerStripColor: Colors.dark.secondary,
+        pointerStripColor: colors.secondary,
         pointerStripWidth: 2,
-        pointerColor: Colors.dark.secondary,
+        pointerColor: colors.secondary,
         radius: 6,
         pointerLabelWidth: 100,
         pointerLabelHeight: 90,

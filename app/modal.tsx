@@ -7,7 +7,7 @@ import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, To
 
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Colors } from '@/constants/Colors';
+import { useTheme } from '@/context/ThemeContext';
 import { MeasurementsRepository } from '@/db/repositories/MeasurementsRepository';
 import { SettingsRepository } from '@/db/repositories/SettingsRepository';
 import { useI18n } from '@/i18n/I18nContext';
@@ -18,6 +18,7 @@ export default function ModalScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { t } = useI18n();
+  const { colors, isDark } = useTheme();
   
   const [weight, setWeight] = useState('');
   const [waist, setWaist] = useState('');
@@ -132,16 +133,26 @@ export default function ModalScreen() {
     }
   };
 
+  // Dynamic Styles
+  const containerStyle = { flex: 1, backgroundColor: colors.background };
+  const titleStyle = { ...styles.title, color: colors.text };
+  const subtitleStyle = { ...styles.subtitle, color: colors.primary };
+  const dateLabelStyle = { ...styles.dateLabel, color: colors.text };
+  const dateButtonStyle = { ...styles.dateButton, backgroundColor: colors.surfaceHighlight };
+  const dateButtonTextStyle = { ...styles.dateButtonText, color: colors.text };
+  const deleteButtonStyle = { marginTop: 16, borderColor: colors.error };
+  const deleteButtonTextStyle = { color: colors.error };
+
   return (
-    <View style={styles.container}>
-      <StatusBar style="light" />
+    <View style={containerStyle}>
+      <StatusBar style={isDark ? "light" : "dark"} />
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
         style={styles.keyboardView}
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          <Text style={styles.title}>{editId ? t.addEntry.editTitle : t.addEntry.title}</Text>
-          <Text style={styles.subtitle}>{formatDate(date)}</Text>
+          <Text style={titleStyle}>{editId ? t.addEntry.editTitle : t.addEntry.title}</Text>
+          <Text style={subtitleStyle}>{formatDate(date)}</Text>
           
           <View style={styles.form}>
             <Input
@@ -183,9 +194,9 @@ export default function ModalScreen() {
             />
              
             <View style={styles.dateContainer}>
-                <Text style={styles.dateLabel}>{t.addEntry.date}</Text>
-                <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateButton}>
-                    <Text style={styles.dateButtonText}>{formatDate(date)}</Text>
+                <Text style={dateLabelStyle}>{t.addEntry.date}</Text>
+                <TouchableOpacity onPress={() => setShowDatePicker(true)} style={dateButtonStyle}>
+                    <Text style={dateButtonTextStyle}>{formatDate(date)}</Text>
                 </TouchableOpacity>
             </View>
 
@@ -211,8 +222,8 @@ export default function ModalScreen() {
                     title={t.addEntry.delete} 
                     variant="outline"
                     onPress={handleDelete} 
-                    style={{ marginTop: 16, borderColor: Colors.dark.error }}
-                    textStyle={{ color: Colors.dark.error }}
+                    style={deleteButtonStyle}
+                    textStyle={deleteButtonTextStyle}
                 />
             )}
             
@@ -230,10 +241,6 @@ export default function ModalScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.dark.background,
-  },
   keyboardView: {
     flex: 1,
   },
@@ -243,13 +250,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: Colors.dark.text,
     textAlign: 'center',
     marginTop: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: Colors.dark.primary,
     textAlign: 'center',
     marginBottom: 32,
   },
@@ -263,20 +268,17 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   dateLabel: {
-    color: Colors.dark.text,
     fontSize: 14,
     marginBottom: 8,
     fontWeight: '500',
   },
   dateButton: {
-    backgroundColor: Colors.dark.surfaceHighlight,
     padding: 14,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: 'transparent',
   },
   dateButtonText: {
-    color: Colors.dark.text,
     fontSize: 16,
   }
 });

@@ -15,6 +15,21 @@ export const Colors = {
         gradientEnd: '#03DAC6',
     }
   },
+  light: {
+    background: '#F2F2F7', // iOS System Gray 6
+    surface: '#FFFFFF',    // White
+    surfaceHighlight: '#E5E5EA', // iOS System Gray 5
+    primary: '#5851DB',    // Slightly darker purple for light mode contrast
+    secondary: '#018786',  // Darker teal
+    text: '#1C1C1E',       // Almost Black
+    textSecondary: '#636366', // Gray
+    error: '#B00020',
+    success: '#007A4B',
+    border: '#C6C6C8',
+    chart: {
+        gradientStart: '#5851DB',
+        gradientEnd: '#018786',
+    }
+  }
 };
 
-export const Theme = Colors.dark;
