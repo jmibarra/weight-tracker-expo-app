@@ -122,11 +122,13 @@ export default function HomeScreen() {
             </View>
         )}
 
-        <Button 
-            title={t.home.addEntry} 
-            onPress={() => router.push('/modal')} 
-            style={{ marginBottom: 20 }}
-        />
+        {!latest && (
+            <Button 
+                title={t.home.addEntry} 
+                onPress={() => router.push('/modal')} 
+                style={{ marginBottom: 20 }}
+            />
+        )}
         
         {!latest && !loading && (
              <Text style={emptyTextStyle}>{t.home.noData}</Text>

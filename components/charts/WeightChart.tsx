@@ -22,6 +22,16 @@ export const WeightChart = ({ data, targetWeight }: WeightChartProps) => {
       return <View style={{height: 250}} />; // Placeholder
   }
 
+  const minRecorded = Math.min(...data.map(d => d.value));
+  let referenceMin = minRecorded;
+  
+  if (targetWeight && targetWeight < minRecorded) {
+      referenceMin = targetWeight;
+  }
+  
+  // Ensure we don't go below 0, though unlikely for weight
+  const yOffset = Math.max(0, Math.floor(referenceMin - 6));
+
   return (
     <View style={{ overflow: 'hidden', paddingBottom: 10 }}>
     <LineChart
@@ -42,6 +52,7 @@ export const WeightChart = ({ data, targetWeight }: WeightChartProps) => {
       rulesType="solid"
       width={screenWidth - 60} // Padding consideration
       height={250}
+      yAxisOffset={yOffset}
       spacing={40}
       initialSpacing={20}
       yAxisColor="transparent"
