@@ -18,6 +18,7 @@ export default function ProfileScreen() {
 
   const [height, setHeight] = useState('');
   const [sex, setSex] = useState('');
+  const [targetWeight, setTargetWeight] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -29,9 +30,11 @@ export default function ProfileScreen() {
       const repo = new SettingsRepository(db);
       const savedHeight = await repo.getSetting('height');
       const savedSex = await repo.getSetting('sex');
+      const savedTarget = await repo.getSetting('targetWeight');
       
       if (savedHeight) setHeight(savedHeight);
       if (savedSex) setSex(savedSex);
+      if (savedTarget) setTargetWeight(savedTarget);
     } catch (e) {
       console.error('Failed to load settings', e);
     }
@@ -48,6 +51,9 @@ export default function ProfileScreen() {
       const repo = new SettingsRepository(db);
       await repo.setSetting('height', height);
       await repo.setSetting('sex', sex);
+      if (targetWeight) {
+        await repo.setSetting('targetWeight', targetWeight);
+      }
       Alert.alert(t.common.success, t.profile.success);
     } catch (e) {
       Alert.alert(t.common.error, t.profile.error);
@@ -81,6 +87,15 @@ export default function ProfileScreen() {
               maxLength={3}
             />
             
+            <Input
+              label={t.profile.targetWeight}
+              placeholder="e.g. 75"
+              keyboardType="numeric"
+              value={targetWeight}
+              onChangeText={setTargetWeight}
+              maxLength={5}
+            />
+
             <Input
               label={t.profile.sex}
               placeholder="e.g. M"

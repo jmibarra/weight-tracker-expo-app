@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useTheme } from '@/context/ThemeContext';
 import { Measurement, MeasurementsRepository } from '@/db/repositories/MeasurementsRepository';
+import { SettingsRepository } from '@/db/repositories/SettingsRepository';
 import { useI18n } from '@/i18n/I18nContext';
 
 export default function HomeScreen() {
@@ -20,13 +21,19 @@ export default function HomeScreen() {
   const [data, setData] = useState<Measurement[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [latest, setLatest] = useState<Measurement | null>(null);
+  const [targetWeight, setTargetWeight] = useState<number>(0);
   const [loading, setLoading] = useState(false);
 
   const loadData = async () => {
     setLoading(true);
     try {
         const repo = new MeasurementsRepository(db);
+        const settingsRepo = new SettingsRepository(db);
+        
         const measurements = await repo.getMeasurementsForChart(); // Ascending for chart
+        const target = await settingsRepo.getSetting('targetWeight');
+        
+        if (target) setTargetWeight(parseFloat(target));
         
         setData(measurements);
         
@@ -81,21 +88,37 @@ export default function HomeScreen() {
         
         <Card style={styles.chartCard}>
             <Text style={cardTitleStyle}>{t.home.trend}</Text>
-            <WeightChart data={chartData} />
+            <WeightChart data={chartData} targetWeight={targetWeight > 0 ? targetWeight : undefined} />
         </Card>
 
         {latest && (
-            <View style={styles.statsRow}>
-                <Card style={styles.statCard}>
-                    <Text style={statLabelStyle}>{t.home.currentWeight}</Text>
-                    <Text style={statValueStyle}>{latest.weight} <Text style={unitStyle}>kg</Text></Text>
-                </Card>
-                <Card style={styles.statCard}>
-                    <Text style={statLabelStyle}>{t.home.bmi}</Text>
-                    <Text style={[styles.statValue, { color: getBmiColor(latest.bmi || 0) }]}>
-                        {latest.bmi || '--'}
-                    </Text>
-                </Card>
+            <View>
+                <View style={styles.statsRow}>
+                    <Card style={styles.statCard}>
+                        <Text style={statLabelStyle}>{t.home.currentWeight}</Text>
+                        <Text style={statValueStyle}>{latest.weight} <Text style={unitStyle}>kg</Text></Text>
+                    </Card>
+                    <Card style={styles.statCard}>
+                        <Text style={statLabelStyle}>{t.home.bmi}</Text>
+                        <Text style={[styles.statValue, { color: getBmiColor(latest.bmi || 0) }]}>
+                            {latest.bmi || '--'}
+                        </Text>
+                    </Card>
+                </View>
+                {targetWeight > 0 && (
+                    <View style={styles.statsRow}>
+                        <Card style={styles.statCard}>
+                            <Text style={statLabelStyle}>{t.home.target}</Text>
+                            <Text style={statValueStyle}>{targetWeight} <Text style={unitStyle}>kg</Text></Text>
+                        </Card>
+                        <Card style={styles.statCard}>
+                            <Text style={statLabelStyle}>{t.home.toGo}</Text>
+                            <Text style={[styles.statValue, { color: colors.primary }]}>
+                                {(latest.weight - targetWeight).toFixed(1)} <Text style={unitStyle}>kg</Text>
+                            </Text>
+                        </Card>
+                    </View>
+                )}
             </View>
         )}
 

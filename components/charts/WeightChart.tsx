@@ -11,9 +11,10 @@ interface WeightData {
 
 interface WeightChartProps {
   data: WeightData[];
+  targetWeight?: number;
 }
 
-export const WeightChart = ({ data }: WeightChartProps) => {
+export const WeightChart = ({ data, targetWeight }: WeightChartProps) => {
   const { colors } = useTheme();
   const screenWidth = Dimensions.get('window').width;
 
@@ -58,6 +59,16 @@ export const WeightChart = ({ data }: WeightChartProps) => {
         pointerLabelHeight: 90,
         activatePointersOnLongPress: true,
         autoAdjustPointerLabelPosition: false,
+      }}
+      showReferenceLine1={!!targetWeight}
+      referenceLine1Position={targetWeight}
+      referenceLine1Config={{
+        color: colors.success,
+        dashWidth: 5,
+        dashGap: 5,
+        thickness: 1,
+        labelText: targetWeight?.toString(),
+        labelTextStyle: { color: colors.success, fontSize: 10 }
       }}
     />
     </View>

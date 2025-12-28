@@ -4,6 +4,8 @@ export const translations = {
       title: 'Dashboard',
       trend: 'Weight Trend',
       currentWeight: 'Current Weight',
+      target: 'Target',
+      toGo: 'To Go',
       bmi: 'BMI',
       addEntry: 'Add New Entry',
       noData: 'No data yet. Add your first entry!',
@@ -23,6 +25,7 @@ export const translations = {
       success: 'Profile updated successfully',
       error: 'Failed to save profile',
       validationHeight: 'Please enter your height',
+      targetWeight: 'Target Weight (kg)',
       tabTitle: 'Profile'
     },
     settings: {
@@ -66,6 +69,8 @@ export const translations = {
       title: 'Panel Principal',
       trend: 'Tendencia de Peso',
       currentWeight: 'Peso Actual',
+      target: 'Objetivo',
+      toGo: 'Faltan',
       bmi: 'IMC',
       addEntry: 'Agregar Entrada',
       noData: 'Sin datos. ¡Agrega tu primera entrada!',
@@ -85,6 +90,7 @@ export const translations = {
       success: 'Perfil actualizado correctamente',
       error: 'Error al guardar el perfil',
       validationHeight: 'Por favor ingresa tu altura',
+      targetWeight: 'Peso Objetivo (kg)',
       tabTitle: 'Perfil'
     },
     settings: {
