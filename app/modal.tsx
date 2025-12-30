@@ -7,6 +7,7 @@ import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, To
 
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { WeightPickerDialog } from '@/components/WeightPickerDialog';
 import { useTheme } from '@/context/ThemeContext';
 import { MeasurementsRepository } from '@/db/repositories/MeasurementsRepository';
 import { SettingsRepository } from '@/db/repositories/SettingsRepository';
@@ -31,6 +32,7 @@ export default function ModalScreen() {
   const [loading, setLoading] = useState(false);
   const [userHeight, setUserHeight] = useState<number | null>(null);
   const [editId, setEditId] = useState<number | null>(null);
+  const [showWeightPicker, setShowWeightPicker] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -54,6 +56,15 @@ export default function ModalScreen() {
                     const [year, month, day] = m.date.split('-').map(Number);
                     setDate(new Date(year, month - 1, day)); 
                 }
+            } else {
+                 // Create Mode: Init with latest weight or 70
+                 const measurementsRepo = new MeasurementsRepository(db);
+                 const latest = await measurementsRepo.getLatestMeasurement();
+                 if (latest) {
+                     setWeight(latest.weight.toString());
+                 } else {
+                     setWeight('70.0');
+                 }
             }
         } catch (e) {
             console.error(e);
@@ -161,14 +172,31 @@ export default function ModalScreen() {
           <Text style={subtitleStyle}>{formatDate(date)}</Text>
           
           <View style={styles.form}>
-            <Input
-              label={t.addEntry.weight}
-              placeholder="e.g. 70.5"
-              keyboardType="numeric"
-              value={weight}
-              onChangeText={setWeight}
-              autoFocus={!editId}
-            />
+            {/* Weight Picker */}
+            <View style={{ marginBottom: 16 }}>
+                <Text style={{ ...styles.dateLabel, color: colors.text }}>{t.addEntry.weight}</Text>
+                 <TouchableOpacity 
+                    onPress={() => setShowWeightPicker(true)}
+                    style={{ 
+                        padding: 16, 
+                        borderWidth: 1, 
+                        borderColor: colors.border, 
+                        borderRadius: 8,
+                        backgroundColor: colors.surface
+                    }}
+                 >
+                    <Text style={{ fontSize: 18, color: colors.text }}>
+                        {weight ? `${weight} kg` : 'Seleccionar peso'}
+                    </Text>
+                 </TouchableOpacity>
+
+                 <WeightPickerDialog
+                    visible={showWeightPicker}
+                    initialValue={weight ? parseFloat(weight) : 70.0}
+                    onClose={() => setShowWeightPicker(false)}
+                    onSave={(val) => setWeight(val.toString())}
+                 />
+            </View>
             
             <View style={styles.row}>
                 <View style={{flex: 1, marginRight: 8}}>

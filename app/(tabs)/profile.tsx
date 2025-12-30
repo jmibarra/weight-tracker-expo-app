@@ -1,11 +1,13 @@
 import { useRouter } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import React, { useEffect, useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { WeightPickerDialog } from '@/components/WeightPickerDialog';
 import { useTheme } from '@/context/ThemeContext';
 import { SettingsRepository } from '@/db/repositories/SettingsRepository';
 import { useI18n } from '@/i18n/I18nContext';
@@ -20,6 +22,7 @@ export default function ProfileScreen() {
   const [sex, setSex] = useState('');
   const [targetWeight, setTargetWeight] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showTargetWeightPicker, setShowTargetWeightPicker] = useState(false);
 
   useEffect(() => {
     loadSettings();
@@ -87,14 +90,31 @@ export default function ProfileScreen() {
               maxLength={3}
             />
             
-            <Input
-              label={t.profile.targetWeight}
-              placeholder="e.g. 75"
-              keyboardType="numeric"
-              value={targetWeight}
-              onChangeText={setTargetWeight}
-              maxLength={5}
-            />
+            {/* Target Weight Picker */}
+            <View style={{ marginBottom: 16 }}>
+                <Text style={{ ...styles.subtitle, color: colors.text, marginBottom: 8, fontSize: 14, fontWeight: '500' }}>{t.profile.targetWeight}</Text>
+                 <TouchableOpacity 
+                    onPress={() => setShowTargetWeightPicker(true)}
+                    style={{ 
+                        padding: 16, 
+                        borderWidth: 1, 
+                        borderColor: colors.border, 
+                        borderRadius: 8,
+                        backgroundColor: colors.surface
+                    }}
+                 >
+                    <Text style={{ fontSize: 18, color: colors.text }}>
+                        {targetWeight ? `${targetWeight} kg` : t.profile.targetWeight}
+                    </Text>
+                 </TouchableOpacity>
+
+                 <WeightPickerDialog
+                    visible={showTargetWeightPicker}
+                    initialValue={targetWeight ? parseFloat(targetWeight) : 70.0}
+                    onClose={() => setShowTargetWeightPicker(false)}
+                    onSave={(val) => setTargetWeight(val.toString())}
+                 />
+            </View>
 
             <Input
               label={t.profile.sex}
