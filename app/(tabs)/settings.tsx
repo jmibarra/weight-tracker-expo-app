@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
 import { useRouter } from 'expo-router';
@@ -5,6 +6,8 @@ import { useSQLiteContext } from 'expo-sqlite';
 import React from 'react';
 import { Alert, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+
 
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -192,6 +195,9 @@ export default function OptionsScreen() {
                     <Text style={sectionTitleStyle}>{t.settings.about}</Text>
                     <Text style={textStyle}>
                          {t.settings.desc}
+                    </Text>
+                    <Text style={[textStyle, { marginTop: 12, fontSize: 12, opacity: 0.7 }]}>
+                        v{Constants.expoConfig?.version ?? '1.0.0'}
                     </Text>
                 </Card>
             </ScrollView>
