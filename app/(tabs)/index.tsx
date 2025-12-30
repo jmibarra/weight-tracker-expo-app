@@ -21,6 +21,7 @@ export default function HomeScreen() {
   const [data, setData] = useState<Measurement[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [latest, setLatest] = useState<Measurement | null>(null);
+  const [previous, setPrevious] = useState<Measurement | null>(null);
   const [targetWeight, setTargetWeight] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [range, setRange] = useState<'all' | '1Y' | '1M' | '1W'>('1W');
@@ -84,6 +85,14 @@ export default function HomeScreen() {
 
         if (measurements.length > 0) {
             setLatest(measurements[measurements.length - 1]);
+            if (measurements.length > 1) {
+                setPrevious(measurements[measurements.length - 2]);
+            } else {
+                setPrevious(null);
+            }
+        } else {
+             setLatest(null);
+             setPrevious(null);
         }
     } catch (e) {
         console.error(e);
@@ -170,6 +179,17 @@ export default function HomeScreen() {
                     <Card style={styles.statCard}>
                         <Text style={statLabelStyle}>{t.home.currentWeight}</Text>
                         <Text style={statValueStyle}>{latest.weight} <Text style={unitStyle}>kg</Text></Text>
+                        {previous && (
+                            <Text style={{ 
+                                fontSize: 12, 
+                                marginTop: 4, 
+                                fontWeight: '600',
+                                color: (latest.weight - previous.weight) > 0 ? colors.error : colors.success 
+                            }}>
+                                {(latest.weight - previous.weight) > 0 ? '+' : ''}
+                                {(latest.weight - previous.weight).toFixed(1)} kg
+                            </Text>
+                        )}
                     </Card>
                     <Card style={styles.statCard}>
                         <Text style={statLabelStyle}>{t.home.bmi}</Text>
