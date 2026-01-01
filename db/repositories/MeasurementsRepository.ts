@@ -63,4 +63,32 @@ export class MeasurementsRepository {
             [date, weight, waist ?? null, hip ?? null, legs ?? null, bmi ?? null, id]
         );
     }
+
+    async fixDateFormats(): Promise<number> {
+        const allMeasurements = await this.getMeasurements();
+        let fixedCount = 0;
+
+        for (const m of allMeasurements) {
+            if (!m.id) continue;
+            
+            // Check if date is in YYYY-MM-DD format with padding
+            const parts = m.date.split('-');
+            if (parts.length === 3) {
+                const year = parts[0];
+                const month = parts[1].padStart(2, '0');
+                const day = parts[2].padStart(2, '0');
+                
+                const newDate = `${year}-${month}-${day}`;
+                
+                if (newDate !== m.date) {
+                    await this.db.runAsync(
+                        `UPDATE measurements SET date = ? WHERE id = ?`,
+                        [newDate, m.id]
+                    );
+                    fixedCount++;
+                }
+            }
+        }
+        return fixedCount;
+    }
 }

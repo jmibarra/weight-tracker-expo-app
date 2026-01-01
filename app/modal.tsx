@@ -18,7 +18,7 @@ export default function ModalScreen() {
   const db = useSQLiteContext();
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { t } = useI18n();
+  const { t, formatDate } = useI18n();
   const { colors, isDark } = useTheme();
   
   const [weight, setWeight] = useState('');
@@ -71,9 +71,9 @@ export default function ModalScreen() {
         }
     }
     loadData();
-  }, [params.id]);
+  }, [params.id, db]);
 
-  const formatDate = (d: Date) => {
+  const toIsoDateString = (d: Date) => {
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
@@ -127,7 +127,7 @@ export default function ModalScreen() {
         }
 
         const data = {
-            date: formatDate(date),
+            date: toIsoDateString(date),
             weight: parseFloat(weight),
             waist: waist ? parseFloat(waist) : undefined,
             hip: hip ? parseFloat(hip) : undefined,
@@ -169,7 +169,7 @@ export default function ModalScreen() {
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <Text style={titleStyle}>{editId ? t.addEntry.editTitle : t.addEntry.title}</Text>
-          <Text style={subtitleStyle}>{formatDate(date)}</Text>
+          <Text style={subtitleStyle}>{formatDate(toIsoDateString(date))}</Text>
           
           <View style={styles.form}>
             {/* Weight Picker */}
@@ -230,7 +230,7 @@ export default function ModalScreen() {
             <View style={styles.dateContainer}>
                 <Text style={dateLabelStyle}>{t.addEntry.date}</Text>
                 <TouchableOpacity onPress={() => setShowDatePicker(true)} style={dateButtonStyle}>
-                    <Text style={dateButtonTextStyle}>{formatDate(date)}</Text>
+                    <Text style={dateButtonTextStyle}>{formatDate(toIsoDateString(date))}</Text>
                 </TouchableOpacity>
             </View>
 

@@ -5,8 +5,11 @@ import 'react-native-reanimated';
 
 import { ThemeProvider as AppThemeProvider, useTheme } from '@/context/ThemeContext';
 import { migrateDbIfNeeded } from '@/db/database';
+import { MeasurementsRepository } from '@/db/repositories/MeasurementsRepository';
+import { SettingsRepository } from '@/db/repositories/SettingsRepository';
 import { I18nProvider } from '@/i18n/I18nContext';
-import { SQLiteProvider } from 'expo-sqlite';
+import { SQLiteProvider, useSQLiteContext } from 'expo-sqlite';
+import { useEffect } from 'react';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -14,6 +17,28 @@ export const unstable_settings = {
 
 function InnerLayout() {
     const { isDark } = useTheme();
+    const db = useSQLiteContext();
+
+    useEffect(() => {
+        const runMigration = async () => {
+            try {
+                const settingsRepo = new SettingsRepository(db);
+                const migrated = await settingsRepo.getSetting('migration_dates_fixed_v1');
+                
+                if (!migrated) {
+                    console.log('Running date format migration...');
+                    const measureRepo = new MeasurementsRepository(db);
+                    const count = await measureRepo.fixDateFormats();
+                    await settingsRepo.setSetting('migration_dates_fixed_v1', 'true');
+                    console.log(`Date migration completed. Fixed ${count} records.`);
+                }
+            } catch (error) {
+                console.error('Migration failed:', error);
+            }
+        };
+
+        runMigration();
+    }, [db]);
 
     return (
         <NativeThemeProvider value={isDark ? DarkTheme : DefaultTheme}>

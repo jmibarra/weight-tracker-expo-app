@@ -12,13 +12,13 @@ import { useI18n } from '@/i18n/I18nContext';
 export default function HistoryScreen() {
   const db = useSQLiteContext();
   const router = useRouter();
-  const { t } = useI18n();
+  const { t, formatDate } = useI18n();
   const { colors } = useTheme();
 
   const [data, setData] = useState<Measurement[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
         const repo = new MeasurementsRepository(db);
@@ -29,12 +29,12 @@ export default function HistoryScreen() {
     } finally {
         setLoading(false);
     }
-  };
+  }, [db]);
 
   useFocusEffect(
     useCallback(() => {
         loadData();
-    }, [])
+    }, [loadData])
   );
 
   // Dynamic Item Styles
@@ -64,7 +64,7 @@ export default function HistoryScreen() {
         <Card style={styles.itemCard}>
             <View style={styles.row}>
                 <View>
-                    <Text style={dateStyle}>{item.date}</Text>
+                    <Text style={dateStyle}>{formatDate(item.date)}</Text>
                     {item.bmi ? <Text style={subtextStyle}>{t.home.bmi}: {item.bmi}</Text> : null}
                 </View>
                 <View style={{alignItems: 'flex-end'}}>

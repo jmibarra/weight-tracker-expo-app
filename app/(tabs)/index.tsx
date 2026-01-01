@@ -15,7 +15,7 @@ import { useI18n } from '@/i18n/I18nContext';
 export default function HomeScreen() {
   const db = useSQLiteContext();
   const router = useRouter();
-  const { t } = useI18n();
+  const { locale, t, formatDate, dateFormat } = useI18n();
   const { colors } = useTheme();
 
   const [data, setData] = useState<Measurement[]>([]);
@@ -52,16 +52,22 @@ export default function HomeScreen() {
           filtered = filtered.filter((_, index) => index % step === 0 || index === filtered.length - 1);
       }
       
-      return filtered.map(m => ({
-            value: m.weight,
-            label: m.date.slice(5),
-            dataPointText: m.weight.toString(),
-      }));
+      return filtered.map(m => {
+            const day = m.date.slice(8, 10);
+            const month = m.date.slice(5, 7);
+            const label = dateFormat.startsWith('dd') ? `${day}/${month}` : `${month}/${day}`;
+            
+            return {
+                value: m.weight,
+                label: label,
+                dataPointText: m.weight.toString(),
+            };
+      });
   };
 
   const filteredChartData = getFilteredData();
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
         const repo = new MeasurementsRepository(db);
@@ -75,12 +81,17 @@ export default function HomeScreen() {
         setData(measurements);
         
         // Transform for chart
-        const cData = measurements.map(m => ({
-            value: m.weight,
-            label: m.date.slice(5), // MM-DD
-            dataPointText: m.weight.toString(),
-            // ...m
-        }));
+        const cData = measurements.map(m => {
+            const day = m.date.slice(8, 10);
+            const month = m.date.slice(5, 7);
+            const label = dateFormat.startsWith('dd') ? `${day}/${month}` : `${month}/${day}`;
+            return {
+                value: m.weight,
+                label: label, 
+                dataPointText: m.weight.toString(),
+                // ...m
+            };
+        });
         setChartData(cData);
 
         if (measurements.length > 0) {
@@ -99,12 +110,12 @@ export default function HomeScreen() {
     } finally {
         setLoading(false);
     }
-  };
+  }, [db, dateFormat]);
 
   useFocusEffect(
     useCallback(() => {
         loadData();
-    }, [])
+    }, [loadData])
   );
 
   const getBmiColor = (bmi: number) => {
@@ -237,12 +248,12 @@ export default function HomeScreen() {
                                     <Card style={styles.statCard}>
                                         <Text style={statLabelStyle}>{t.home.maxWeight}</Text>
                                         <Text style={statValueStyle}>{maxRecord.weight} <Text style={unitStyle}>kg</Text></Text>
-                                        <Text style={{ fontSize: 10, color: colors.textSecondary, marginTop: 4 }}>{maxRecord.date}</Text>
+                                        <Text style={{ fontSize: 10, color: colors.textSecondary, marginTop: 4 }}>{formatDate(maxRecord.date)}</Text>
                                     </Card>
                                     <Card style={styles.statCard}>
                                         <Text style={statLabelStyle}>{t.home.minWeight}</Text>
                                         <Text style={statValueStyle}>{minRecord.weight} <Text style={unitStyle}>kg</Text></Text>
-                                        <Text style={{ fontSize: 10, color: colors.textSecondary, marginTop: 4 }}>{minRecord.date}</Text>
+                                        <Text style={{ fontSize: 10, color: colors.textSecondary, marginTop: 4 }}>{formatDate(minRecord.date)}</Text>
                                     </Card>
                                 </View>
                              );

@@ -18,7 +18,7 @@ import { useI18n } from '@/i18n/I18nContext';
 export default function OptionsScreen() {
     const router = useRouter();
     const db = useSQLiteContext();
-    const { t, locale, setLocale } = useI18n();
+    const { t, locale, setLocale, dateFormat, setDateFormat } = useI18n();
     const { theme, setTheme, colors } = useTheme();
 
     const handleImportCsv = async () => {
@@ -70,7 +70,12 @@ export default function OptionsScreen() {
                 // Parse Date: 15/06/2016 -> YYYY-MM-DD
                 const dateParts = parts[0].split('/');
                 if (dateParts.length !== 3) continue;
-                const date = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`; // ISO format for DB
+                
+                const day = dateParts[0].padStart(2, '0');
+                const month = dateParts[1].padStart(2, '0');
+                const year = dateParts[2];
+                
+                const date = `${year}-${month}-${day}`; // ISO format for DB
 
                 // Parse Weight: "117,5" -> 117.5
                 let weightStr = parts[1].replace(/"/g, '').replace(',', '.');
@@ -179,7 +184,7 @@ export default function OptionsScreen() {
                         <Text style={[textStyle, { fontSize: 13, fontWeight: '600', marginBottom: 4 }]}>{t.settings.csvFormatTitle}</Text>
                         <Text style={[textStyle, { fontSize: 12, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>
                             Fecha,Peso,Cambio,IMC{'\n'}
-                            15/06/2016,"117,5",,"35,1"
+                            15/06/2016,&quot;117,5&quot;,,&quot;35,1&quot;
                         </Text>
                     </View>
 
@@ -189,6 +194,61 @@ export default function OptionsScreen() {
                         variant="secondary"
                         style={{marginTop: 16}}
                     />
+
+                    <Button 
+                        title="Reparar Fechas (Fix Dates)" 
+                        onPress={async () => {
+                            try {
+                                const repo = new MeasurementsRepository(db);
+                                const count = await repo.fixDateFormats();
+                                Alert.alert("Success", `Fixed ${count} date records.`);
+                            } catch (e: any) {
+                                Alert.alert("Error", e.message);
+                            }
+                        }} 
+                        variant="outline"
+                        style={{marginTop: 16}}
+                    />
+                </Card>
+
+                <Card>
+                    <Text style={sectionTitleStyle}>Formato de Fecha</Text>
+                    <View style={styles.themeRow}>
+                        <TouchableOpacity 
+                            style={[
+                                styles.themeOption, 
+                                { 
+                                    backgroundColor: dateFormat === 'dd/MM/yyyy' ? colors.primary : colors.surfaceHighlight,
+                                    borderColor: dateFormat === 'dd/MM/yyyy' ? colors.primary : 'transparent'
+                                }
+                            ]} 
+                            onPress={() => setDateFormat('dd/MM/yyyy')}
+                        >
+                            <Text style={[
+                                styles.themeText, 
+                                { color: dateFormat === 'dd/MM/yyyy' ? '#FFFFFF' : colors.text }
+                            ]}>
+                                dd/MM/yyyy
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                            style={[
+                                styles.themeOption, 
+                                { 
+                                    backgroundColor: dateFormat === 'MM/dd/yyyy' ? colors.primary : colors.surfaceHighlight,
+                                    borderColor: dateFormat === 'MM/dd/yyyy' ? colors.primary : 'transparent'
+                                }
+                            ]} 
+                            onPress={() => setDateFormat('MM/dd/yyyy')}
+                        >
+                            <Text style={[
+                                styles.themeText, 
+                                { color: dateFormat === 'MM/dd/yyyy' ? '#FFFFFF' : colors.text }
+                            ]}>
+                                MM/dd/yyyy
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
                 </Card>
 
                  <Card>
