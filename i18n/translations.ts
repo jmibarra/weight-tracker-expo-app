@@ -53,7 +53,12 @@ export const translations = {
       tabTitle: 'Options',
       language: 'Language',
       selectLanguage: 'Select Language',
-      appearance: 'Appearance'
+      appearance: 'Appearance',
+      deleteAll: 'Delete All History',
+      deleteAllConfirmTitle: 'Delete All History',
+      deleteAllConfirmMessage: 'Are you sure you want to delete all records? This action cannot be undone.',
+      deletionSuccess: 'All records have been deleted.',
+      dateFormat: 'Date Format'
     },
     addEntry: {
       title: 'New Entry',
@@ -130,7 +135,12 @@ export const translations = {
       tabTitle: 'Opciones',
       language: 'Idioma',
       selectLanguage: 'Seleccionar Idioma',
-      appearance: 'Apariencia'
+      appearance: 'Apariencia',
+      deleteAll: 'Eliminar Historial Completo',
+      deleteAllConfirmTitle: 'Eliminar Todo',
+      deleteAllConfirmMessage: '¿Estás seguro de que quieres eliminar todos los registros? Esta acción no se puede deshacer.',
+      deletionSuccess: 'Todos los registros han sido eliminados.',
+      dateFormat: 'Formato de Fecha'
     },
     addEntry: {
       title: 'Nueva Entrada',

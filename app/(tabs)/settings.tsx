@@ -212,7 +212,7 @@ export default function OptionsScreen() {
                 </Card>
 
                 <Card>
-                    <Text style={sectionTitleStyle}>Formato de Fecha</Text>
+                    <Text style={sectionTitleStyle}>{t.settings.dateFormat || "Date Format"}</Text>
                     <View style={styles.themeRow}>
                         <TouchableOpacity 
                             style={[
@@ -250,6 +250,37 @@ export default function OptionsScreen() {
                         </TouchableOpacity>
                     </View>
                 </Card>
+
+                <View style={{ marginTop: 20, marginBottom: 20 }}>
+                    <TouchableOpacity 
+                        onPress={() => {
+                            Alert.alert(
+                                t.settings.deleteAllConfirmTitle,
+                                t.settings.deleteAllConfirmMessage,
+                                [
+                                    { text: t.addEntry.cancel, style: 'cancel' },
+                                    { 
+                                        text: t.addEntry.delete, 
+                                        style: 'destructive', 
+                                        onPress: async () => {
+                                            try {
+                                                const repo = new MeasurementsRepository(db);
+                                                await repo.deleteAll();
+                                                Alert.alert(t.common.success, t.settings.deletionSuccess);
+                                            } catch (e: any) {
+                                                console.error(e);
+                                                Alert.alert(t.common.error, 'Failed to delete records');
+                                            }
+                                        }
+                                    }
+                                ]
+                            );
+                        }}
+                        style={{ backgroundColor: colors.error, paddingVertical: 14, paddingHorizontal: 24, borderRadius: 12, alignItems: 'center' }}
+                    >
+                        <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>{t.settings.deleteAll}</Text>
+                    </TouchableOpacity>
+                </View>
 
                  <Card>
                     <Text style={sectionTitleStyle}>{t.settings.about}</Text>
