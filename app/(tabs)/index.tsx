@@ -145,7 +145,7 @@ export default function HomeScreen() {
                     
                     {/* BMI Badge */}
                      <View style={[styles.badge, { backgroundColor: getBmiColor(latest.bmi || 0) + '20' }]}>
-                        <Text style={[styles.badgeText, { color: getBmiColor(latest.bmi || 0) }]}>BMI {latest.bmi || '--'}</Text>
+                        <Text style={[styles.badgeText, { color: getBmiColor(latest.bmi || 0) }]}>{t.home.bmi}: {latest.bmi || '--'}</Text>
                     </View>
                 </View>
 
