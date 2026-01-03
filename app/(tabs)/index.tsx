@@ -246,6 +246,7 @@ export default function HomeScreen() {
                         <Card style={styles.gridCard}>
                             <Text style={statLabelStyle}>{t.home.startWeight}</Text>
                             <Text style={statValueStyle}>{data[0].weight} <Text style={unitStyle}>kg</Text></Text>
+                            <Text style={{ fontSize: 10, color: colors.textSecondary, marginTop: 2 }}>{formatDate(data[0].date)}</Text>
                         </Card>
                         
                         {(() => {
@@ -256,10 +257,12 @@ export default function HomeScreen() {
                                     <Card style={styles.gridCard}>
                                         <Text style={statLabelStyle}>{t.home.maxWeight}</Text>
                                         <Text style={statValueStyle}>{maxRecord.weight} <Text style={unitStyle}>kg</Text></Text>
+                                        <Text style={{ fontSize: 10, color: colors.textSecondary, marginTop: 2 }}>{formatDate(maxRecord.date)}</Text>
                                     </Card>
                                     <Card style={styles.gridCard}>
                                         <Text style={statLabelStyle}>{t.home.minWeight}</Text>
                                         <Text style={statValueStyle}>{minRecord.weight} <Text style={unitStyle}>kg</Text></Text>
+                                        <Text style={{ fontSize: 10, color: colors.textSecondary, marginTop: 2 }}>{formatDate(minRecord.date)}</Text>
                                     </Card>
                                 </>
                              );
@@ -277,7 +280,7 @@ const styles = StyleSheet.create({
   content: {
     padding: 16,
     paddingTop: 8,
-    paddingBottom: 80, // Add bottom padding to avoid tab bar overlap
+    paddingBottom: 120, // Add bottom padding to avoid tab bar overlap
   },
   headerTitle: {
     fontSize: 26,
