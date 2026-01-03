@@ -20,6 +20,7 @@ export const translations = {
       maxWeight: 'Max Weight',
       minWeight: 'Min Weight',
       noChartData: 'No records for this period.',
+      vsLastRecord: 'vs last record',
       tabTitle: 'Home'
     },
     history: {
@@ -102,6 +103,7 @@ export const translations = {
       maxWeight: 'Peso Máximo',
       minWeight: 'Peso Mínimo',
       noChartData: 'No hay registros para este periodo.',
+      vsLastRecord: 'vs último registro',
       tabTitle: 'Inicio'
     },
     history: {

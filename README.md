@@ -22,9 +22,9 @@ Una aplicación simple y elegante para el seguimiento de tu peso corporal, const
 
 ## 📸 Capturas de Pantalla
 
-|                             Grafico principal                             |                              Métricas clave                               |                                 Histórico                                 |                                   Perfil                                    |                                 Opciones                                 |
-| :-----------------------------------------------------------------------: | :-----------------------------------------------------------------------: | :-----------------------------------------------------------------------: | :-------------------------------------------------------------------------: | :----------------------------------------------------------------------: |
-| <img src="assets/images/app-screenshots/main_screen_1.jpg" width="180" /> | <img src="assets/images/app-screenshots/main_screen_2.jpg" width="180" /> | <img src="assets/images/app-screenshots/historic_data.jpg" width="180" /> | <img src="assets/images/app-screenshots/profile_section.jpg" width="180" /> | <img src="assets/images/app-screenshots/options_menu.jpg" width="180" /> |
+|                              Grafico principal                              |                                 Histórico                                 |                                     Perfil                                      |                                 Opciones                                 |
+| :-------------------------------------------------------------------------: | :-----------------------------------------------------------------------: | :-----------------------------------------------------------------------------: | :----------------------------------------------------------------------: |
+| <img src="assets/images/app-screenshots/main_screen_new.jpg" width="180" /> | <img src="assets/images/app-screenshots/historic_data.jpg" width="180" /> | <img src="assets/images/app-screenshots/profile_section_new.jpg" width="180" /> | <img src="assets/images/app-screenshots/options_menu.jpg" width="180" /> |
 
 _(Vistas principales de la aplicación: Inicio, Histórico Completo, Perfil y Configuración)_
 

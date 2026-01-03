@@ -15,11 +15,10 @@ import { useI18n } from '@/i18n/I18nContext';
 export default function HomeScreen() {
   const db = useSQLiteContext();
   const router = useRouter();
-  const { locale, t, formatDate, dateFormat } = useI18n();
+  const { t, formatDate, dateFormat } = useI18n();
   const { colors } = useTheme();
 
   const [data, setData] = useState<Measurement[]>([]);
-  const [chartData, setChartData] = useState<any[]>([]);
   const [latest, setLatest] = useState<Measurement | null>(null);
   const [previous, setPrevious] = useState<Measurement | null>(null);
   const [targetWeight, setTargetWeight] = useState<number>(0);
@@ -70,6 +69,7 @@ export default function HomeScreen() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
+        console.log('Loading dashboard data...');
         const repo = new MeasurementsRepository(db);
         const settingsRepo = new SettingsRepository(db);
         
@@ -79,20 +79,6 @@ export default function HomeScreen() {
         if (target) setTargetWeight(parseFloat(target));
         
         setData(measurements);
-        
-        // Transform for chart
-        const cData = measurements.map(m => {
-            const day = m.date.slice(8, 10);
-            const month = m.date.slice(5, 7);
-            const label = dateFormat.startsWith('dd') ? `${day}/${month}` : `${month}/${day}`;
-            return {
-                value: m.weight,
-                label: label, 
-                dataPointText: m.weight.toString(),
-                // ...m
-            };
-        });
-        setChartData(cData);
 
         if (measurements.length > 0) {
             setLatest(measurements[measurements.length - 1]);
@@ -110,7 +96,7 @@ export default function HomeScreen() {
     } finally {
         setLoading(false);
     }
-  }, [db, dateFormat]);
+  }, [db]);
 
   useFocusEffect(
     useCallback(() => {
@@ -129,10 +115,12 @@ export default function HomeScreen() {
   const containerStyle = { flex: 1, backgroundColor: colors.background };
   const headerTitleStyle = { ...styles.headerTitle, color: colors.text };
   const cardTitleStyle = { ...styles.cardTitle, color: colors.text };
-  const statLabelStyle = { ...styles.statLabel, color: colors.textSecondary };
-  const statValueStyle = { ...styles.statValue, color: colors.text };
-  const unitStyle = { ...styles.unit, color: colors.textSecondary };
-  const emptyTextStyle = { ...styles.emptyText, color: colors.textSecondary };
+  
+  // Compact stats
+  const statLabelStyle = { fontSize: 10, color: colors.textSecondary, marginBottom: 2 };
+  const statValueStyle = { fontSize: 15, fontWeight: '700' as const, color: colors.text };
+  const unitStyle = { fontSize: 10, fontWeight: 'normal' as const, color: colors.textSecondary };
+  const getChangeColor = (val: number) => val > 0 ? colors.error : colors.success;
 
   return (
     <SafeAreaView style={containerStyle} edges={['top']}>
@@ -142,139 +130,142 @@ export default function HomeScreen() {
       >
         <Text style={headerTitleStyle}>{t.home.title}</Text>
         
+        {/* Main Weight Card */}
+        {latest ? (
+            <Card style={styles.mainCard}>
+                <View style={styles.mainCardHeader}>
+                    <Text style={{ fontSize: 14, color: colors.textSecondary, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 }}>{t.home.currentWeight}</Text>
+                    <Text style={{ fontSize: 13, color: colors.textSecondary }}>{formatDate(latest.date)}</Text>
+                </View>
+                
+                <View style={styles.weightRow}>
+                    <Text style={styles.bigWeight}>{latest.weight}<Text style={styles.bigUnit}>kg</Text></Text>
+                    
+                    {/* BMI Badge */}
+                     <View style={[styles.badge, { backgroundColor: getBmiColor(latest.bmi || 0) + '20' }]}>
+                        <Text style={[styles.badgeText, { color: getBmiColor(latest.bmi || 0) }]}>BMI {latest.bmi || '--'}</Text>
+                    </View>
+                </View>
+
+                {/* Trend Line */}
+                {previous && (
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
+                        <Text style={{ 
+                            fontSize: 14, 
+                            fontWeight: '600',
+                            color: getChangeColor(latest.weight - previous.weight)
+                        }}>
+                            {(latest.weight - previous.weight) > 0 ? '↑' : '↓'} {Math.abs(latest.weight - previous.weight).toFixed(1)} kg
+                        </Text>
+                        <Text style={{ fontSize: 13, color: colors.textSecondary, marginLeft: 6 }}> {t.home.vsLastRecord}</Text>
+                    </View>
+                )}
+            </Card>
+        ) : (
+             !loading && (
+                 <Card style={{ padding: 30, alignItems: 'center' }}>
+                    <Text style={{ color: colors.textSecondary, marginBottom: 16 }}>{t.home.noData}</Text>
+                    <Button 
+                        title={t.home.addEntry} 
+                        onPress={() => router.push('/modal')} 
+                    />
+                 </Card>
+             )
+        )}
+
+        {/* Chart Section */}
         <Card style={styles.chartCard}>
-            <Text style={cardTitleStyle}>{t.home.trend}</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, width: '100%' }}>
+                <Text style={cardTitleStyle}>{t.home.trend}</Text>
+                 <View style={{ flexDirection: 'row', gap: 6 }}>
+                    {(['all', '1Y', '1M', '1W'] as const).map(r => (
+                        <TouchableOpacity 
+                            key={r} 
+                            onPress={() => setRange(r)}
+                            style={{
+                                paddingVertical: 4,
+                                paddingHorizontal: 10,
+                                borderRadius: 16,
+                                backgroundColor: range === r ? colors.primary : colors.surfaceHighlight,
+                            }}
+                        >
+                            <Text style={{ 
+                                color: range === r ? '#fff' : colors.textSecondary,
+                                fontSize: 11,
+                                fontWeight: '600'
+                            }}>
+                               {{
+                                   'all': t.home.ranges.all,
+                                   '1Y': t.home.ranges.year,
+                                   '1M': t.home.ranges.month,
+                                   '1W': t.home.ranges.week
+                               }[r]}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+            </View>
             
             {filteredChartData.length > 0 ? (
                  <WeightChart data={filteredChartData} targetWeight={targetWeight > 0 ? targetWeight : undefined} />
             ) : (
-                <View style={{ height: 200, justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                <View style={{ height: 180, justifyContent: 'center', alignItems: 'center', width: '100%' }}>
                     <Text style={{ color: colors.textSecondary }}>{t.home.noChartData}</Text>
                 </View>
             )}
-            
-            <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 10, marginTop: 10 }}>
-                {(['all', '1Y', '1M', '1W'] as const).map(r => (
-                    <TouchableOpacity 
-                        key={r} 
-                        onPress={() => setRange(r)}
-                        style={{
-                            paddingVertical: 6,
-                            paddingHorizontal: 12,
-                            borderRadius: 20,
-                            backgroundColor: range === r ? colors.primary : 'transparent',
-                            borderWidth: 1,
-                            borderColor: range === r ? colors.primary : colors.border
-                        }}
-                    >
-                        <Text style={{ 
-                            color: range === r ? '#fff' : colors.textSecondary,
-                            fontSize: 12,
-                            fontWeight: '600'
-                        }}>
-                           {{
-                               'all': t.home.ranges.all,
-                               '1Y': t.home.ranges.year,
-                               '1M': t.home.ranges.month,
-                               '1W': t.home.ranges.week
-                           }[r]}
-                        </Text>
-                    </TouchableOpacity>
-                ))}
-            </View>
         </Card>
 
+        {/* Secondary Stats Grid */}
         {latest && (
-            <View>
-                <View style={styles.statsRow}>
-                    <Card style={styles.statCard}>
-                        <Text style={statLabelStyle}>{t.home.currentWeight}</Text>
-                        <Text style={statValueStyle}>{latest.weight} <Text style={unitStyle}>kg</Text></Text>
-                        {previous && (
-                            <Text style={{ 
-                                fontSize: 12, 
-                                marginTop: 4, 
-                                fontWeight: '600',
-                                color: (latest.weight - previous.weight) > 0 ? colors.error : colors.success 
-                            }}>
-                                {(latest.weight - previous.weight) > 0 ? '+' : ''}
-                                {(latest.weight - previous.weight).toFixed(1)} kg
-                            </Text>
-                        )}
-                    </Card>
-                    <Card style={styles.statCard}>
-                        <Text style={statLabelStyle}>{t.home.bmi}</Text>
-                        <Text style={[styles.statValue, { color: getBmiColor(latest.bmi || 0) }]}>
-                            {latest.bmi || '--'}
-                        </Text>
-                    </Card>
-                </View>
+            <View style={styles.grid}>
                 {targetWeight > 0 && (
-                    <View style={styles.statsRow}>
-                        <Card style={styles.statCard}>
+                    <>
+                        <Card style={styles.gridCard}>
                             <Text style={statLabelStyle}>{t.home.target}</Text>
                             <Text style={statValueStyle}>{targetWeight} <Text style={unitStyle}>kg</Text></Text>
                         </Card>
-                        <Card style={styles.statCard}>
+                        <Card style={styles.gridCard}>
                             <Text style={statLabelStyle}>{t.home.toGo}</Text>
-                            <Text style={[styles.statValue, { color: colors.primary }]}>
+                            <Text style={[statValueStyle, { color: colors.primary }]}>
                                 {(latest.weight - targetWeight).toFixed(1)} <Text style={unitStyle}>kg</Text>
                             </Text>
                         </Card>
-                    </View>
+                    </>
                 )}
 
-                {data.length > 0 && (
-                    <View>
-                        <View style={styles.statsRow}>
-                            <Card style={styles.statCard}>
-                                <Text style={statLabelStyle}>{t.home.startWeight}</Text>
-                                <Text style={statValueStyle}>{data[0].weight} <Text style={unitStyle}>kg</Text></Text>
-                            </Card>
-                            <Card style={styles.statCard}>
-                                <Text style={statLabelStyle}>{t.home.progress}</Text>
-                                <Text style={[styles.statValue, { color: (latest.weight - data[0].weight) > 0 ? colors.error : colors.success }]}>
-                                    {(latest.weight - data[0].weight).toFixed(1)} <Text style={unitStyle}>kg</Text>
-                                </Text>
-                            </Card>
-                        </View>
+                 {data.length > 0 && (
+                    <>
+                        <Card style={styles.gridCard}>
+                             <Text style={statLabelStyle}>{t.home.progress}</Text>
+                             <Text style={[statValueStyle, { color: (latest.weight - data[0].weight) > 0 ? colors.error : colors.success }]}>
+                                {(latest.weight - data[0].weight).toFixed(1)} <Text style={unitStyle}>kg</Text>
+                             </Text>
+                        </Card>
+                        <Card style={styles.gridCard}>
+                            <Text style={statLabelStyle}>{t.home.startWeight}</Text>
+                            <Text style={statValueStyle}>{data[0].weight} <Text style={unitStyle}>kg</Text></Text>
+                        </Card>
                         
                         {(() => {
                              const maxRecord = data.reduce((prev, current) => (prev.weight > current.weight) ? prev : current, data[0]);
                              const minRecord = data.reduce((prev, current) => (prev.weight < current.weight) ? prev : current, data[0]);
-                             
                              return (
-                                <View style={styles.statsRow}>
-                                    <Card style={styles.statCard}>
+                                <>
+                                    <Card style={styles.gridCard}>
                                         <Text style={statLabelStyle}>{t.home.maxWeight}</Text>
                                         <Text style={statValueStyle}>{maxRecord.weight} <Text style={unitStyle}>kg</Text></Text>
-                                        <Text style={{ fontSize: 10, color: colors.textSecondary, marginTop: 4 }}>{formatDate(maxRecord.date)}</Text>
                                     </Card>
-                                    <Card style={styles.statCard}>
+                                    <Card style={styles.gridCard}>
                                         <Text style={statLabelStyle}>{t.home.minWeight}</Text>
                                         <Text style={statValueStyle}>{minRecord.weight} <Text style={unitStyle}>kg</Text></Text>
-                                        <Text style={{ fontSize: 10, color: colors.textSecondary, marginTop: 4 }}>{formatDate(minRecord.date)}</Text>
                                     </Card>
-                                </View>
+                                </>
                              );
                         })()}
-                    </View>
-                )}
+                    </>
+                 )}
             </View>
         )}
-
-        {!latest && (
-            <Button 
-                title={t.home.addEntry} 
-                onPress={() => router.push('/modal')} 
-                style={{ marginBottom: 20 }}
-            />
-        )}
-        
-        {!latest && !loading && (
-             <Text style={emptyTextStyle}>{t.home.noData}</Text>
-        )}
-
       </ScrollView>
     </SafeAreaView>
   );
@@ -282,48 +273,71 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   content: {
-    padding: 20,
+    padding: 16,
+    paddingTop: 8,
+    paddingBottom: 80, // Add bottom padding to avoid tab bar overlap
   },
   headerTitle: {
-    fontSize: 34,
+    fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 12,
+  },
+  mainCard: {
+      marginBottom: 12,
+      padding: 16,
+  },
+  mainCardHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 8,
+  },
+  weightRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      gap: 10,
+  },
+  bigWeight: {
+      fontSize: 42,
+      fontWeight: '800',
+      lineHeight: 46,
+  },
+  bigUnit: {
+      fontSize: 16,
+      fontWeight: '600',
+      marginLeft: 4,
+  },
+  badge: {
+     paddingVertical: 3,
+     paddingHorizontal: 6,
+     borderRadius: 6,
+     alignSelf: 'center',
+     marginBottom: 6, 
+  },
+  badgeText: {
+      fontWeight: '700',
+      fontSize: 11,
   },
   chartCard: {
-    marginBottom: 20,
+    marginBottom: 12,
     alignItems: 'center',
+    padding: 12,
+    paddingLeft: 20,
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
-    alignSelf: 'flex-start',
-    marginBottom: 16,
   },
-  statsRow: {
-    flexDirection: 'row',
-    gap: 16,
-    marginBottom: 20,
+  grid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8, // Tighter gap
   },
-  statCard: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 30,
+  gridCard: {
+      flex: 1, 
+      minWidth: '28%', // Allow 3 columns (approx 30%)
+      padding: 10,
+      justifyContent: 'center',
+      alignItems: 'center', // Center align content for 3-col
   },
-  statLabel: {
-    fontSize: 14,
-    marginBottom: 4,
-  },
-  statValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  unit: {
-    fontSize: 14,
-    fontWeight: 'normal',
-  },
-  emptyText: {
-    textAlign: 'center',
-    marginTop: 20,
-  }
 });
