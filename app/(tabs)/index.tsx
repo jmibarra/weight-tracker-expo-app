@@ -139,7 +139,9 @@ export default function HomeScreen() {
                 </View>
                 
                 <View style={styles.weightRow}>
-                    <Text style={styles.bigWeight}>{latest.weight}<Text style={styles.bigUnit}>kg</Text></Text>
+                    <Text style={[styles.bigWeight, { color: colors.text }]}>
+                        {latest.weight}<Text style={[styles.bigUnit, { color: colors.text }]}>kg</Text>
+                    </Text>
                     
                     {/* BMI Badge */}
                      <View style={[styles.badge, { backgroundColor: getBmiColor(latest.bmi || 0) + '20' }]}>
