@@ -2,6 +2,7 @@ import Constants from 'expo-constants';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
 import { useRouter } from 'expo-router';
+import * as Sharing from 'expo-sharing';
 import { useSQLiteContext } from 'expo-sqlite';
 import React from 'react';
 import { Alert, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -106,6 +107,55 @@ export default function OptionsScreen() {
         }
     };
 
+    const handleExportCsv = async () => {
+        try {
+            const repo = new MeasurementsRepository(db);
+            const measurements = await repo.getMeasurements();
+
+            if (measurements.length === 0) {
+                 Alert.alert(t.common.error, "No data to export");
+                 return;
+            }
+            
+            // Header: Fecha,Peso,Cambio,IMC,Cintura,Cadera,Piernas
+            // Data format: DD/MM/YYYY,"123,4",,"24,5",...
+            let csvContent = "Fecha,Peso,Cambio,IMC,Cintura,Cadera,Piernas\n";
+
+            measurements.forEach(m => {
+                // Convert date from YYYY-MM-DD to DD/MM/YYYY
+                const [year, month, day] = m.date.split('-');
+                const localDate = `${day}/${month}/${year}`;
+                
+                const weightStr = `"${m.weight.toString().replace('.', ',')}"`;
+                const bmiStr = m.bmi ? `"${m.bmi.toString().replace('.', ',')}"` : "";
+                const cintura = m.waist ? `"${m.waist.toString().replace('.', ',')}"` : "";
+                const cadera = m.hip ? `"${m.hip.toString().replace('.', ',')}"` : "";
+                const piernas = m.legs ? `"${m.legs.toString().replace('.', ',')}"` : "";
+                
+                // Cambio blank for now as we don't calculate it here per row relative to prev easily without loop logic change,
+                // and user said "format used for import" which implies structure compatibility.
+                const cambio = ""; 
+
+                csvContent += `${localDate},${weightStr},${cambio},${bmiStr},${cintura},${cadera},${piernas}\n`;
+            });
+
+            const fileName = `weight_data_${new Date().toISOString().split('T')[0]}.csv`;
+            const fileUri = FileSystem.cacheDirectory + fileName;
+
+            await FileSystem.writeAsStringAsync(fileUri, csvContent, { encoding: FileSystem.EncodingType.UTF8 });
+
+            if (await Sharing.isAvailableAsync()) {
+                await Sharing.shareAsync(fileUri);
+            } else {
+                Alert.alert(t.common.error, "Sharing is not available on this device");
+            }
+
+        } catch (e: any) {
+            console.error(e);
+            Alert.alert(t.common.error, `${t.settings.exportError}: ${e.message}`);
+        }
+    };
+
     const toggleLanguage = () => {
         setLocale(locale === 'en' ? 'es' : 'en');
     };
@@ -157,60 +207,6 @@ export default function OptionsScreen() {
                         </Text>
                      </View>
                 </Card>
-
-                <Card>
-                    <Text style={sectionTitleStyle}>{t.settings.appearance || "Appearance"}</Text>
-                    <View style={styles.themeRow}>
-                        <ThemeOption value="light" label="Light" />
-                        <ThemeOption value="dark" label="Dark" />
-                        <ThemeOption value="system" label="System" />
-                    </View>
-                </Card>
-
-                <Card>
-                    <Text style={sectionTitleStyle}>{t.settings.dataManagement}</Text>
-                    <Text style={textStyle}>
-                        {t.settings.importCsvDesc}
-                    </Text>
-                    
-                    <View style={{ 
-                        marginTop: 12, 
-                        padding: 12, 
-                        backgroundColor: colors.surfaceHighlight, 
-                        borderRadius: 8,
-                        borderLeftWidth: 3,
-                        borderLeftColor: colors.primary 
-                    }}>
-                        <Text style={[textStyle, { fontSize: 13, fontWeight: '600', marginBottom: 4 }]}>{t.settings.csvFormatTitle}</Text>
-                        <Text style={[textStyle, { fontSize: 12, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>
-                            Fecha,Peso,Cambio,IMC{'\n'}
-                            15/06/2016,&quot;117,5&quot;,,&quot;35,1&quot;
-                        </Text>
-                    </View>
-
-                    <Button 
-                        title={t.settings.importCsv} 
-                        onPress={handleImportCsv} 
-                        variant="secondary"
-                        style={{marginTop: 16}}
-                    />
-
-                    <Button 
-                        title="Reparar Fechas (Fix Dates)" 
-                        onPress={async () => {
-                            try {
-                                const repo = new MeasurementsRepository(db);
-                                const count = await repo.fixDateFormats();
-                                Alert.alert("Success", `Fixed ${count} date records.`);
-                            } catch (e: any) {
-                                Alert.alert("Error", e.message);
-                            }
-                        }} 
-                        variant="outline"
-                        style={{marginTop: 16}}
-                    />
-                </Card>
-
                 <Card>
                     <Text style={sectionTitleStyle}>{t.settings.dateFormat || "Date Format"}</Text>
                     <View style={styles.themeRow}>
@@ -251,36 +247,96 @@ export default function OptionsScreen() {
                     </View>
                 </Card>
 
-                <View style={{ marginTop: 20, marginBottom: 20 }}>
-                    <TouchableOpacity 
-                        onPress={() => {
-                            Alert.alert(
-                                t.settings.deleteAllConfirmTitle,
-                                t.settings.deleteAllConfirmMessage,
-                                [
-                                    { text: t.addEntry.cancel, style: 'cancel' },
-                                    { 
-                                        text: t.addEntry.delete, 
-                                        style: 'destructive', 
-                                        onPress: async () => {
-                                            try {
-                                                const repo = new MeasurementsRepository(db);
-                                                await repo.deleteAll();
-                                                Alert.alert(t.common.success, t.settings.deletionSuccess);
-                                            } catch (e: any) {
-                                                console.error(e);
-                                                Alert.alert(t.common.error, 'Failed to delete records');
+                <Card>
+                    <Text style={sectionTitleStyle}>{t.settings.appearance || "Appearance"}</Text>
+                    <View style={styles.themeRow}>
+                        <ThemeOption value="light" label="Light" />
+                        <ThemeOption value="dark" label="Dark" />
+                        <ThemeOption value="system" label="System" />
+                    </View>
+                </Card>
+
+                <Card>
+                    <Text style={sectionTitleStyle}>{t.settings.dataManagement}</Text>
+                    <Text style={textStyle}>
+                        {t.settings.importCsvDesc}
+                    </Text>
+                    
+                    <View style={{ 
+                        marginTop: 12, 
+                        padding: 12, 
+                        backgroundColor: colors.surfaceHighlight, 
+                        borderRadius: 8,
+                        borderLeftWidth: 3,
+                        borderLeftColor: colors.primary 
+                    }}>
+                        <Text style={[textStyle, { fontSize: 13, fontWeight: '600', marginBottom: 4 }]}>{t.settings.csvFormatTitle}</Text>
+                        <Text style={[textStyle, { fontSize: 12, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' }]}>
+                            Fecha,Peso,Cambio,IMC{'\n'}
+                            15/06/2016,&quot;117,5&quot;,,&quot;35,1&quot;
+                        </Text>
+                    </View>
+
+                    <Button 
+                        title={t.settings.importCsv} 
+                        onPress={handleImportCsv} 
+                        variant="secondary"
+                        style={{marginTop: 16}}
+                    />
+
+                     <Button 
+                        title="Reparar Fechas (Fix Dates)" 
+                        onPress={async () => {
+                            try {
+                                const repo = new MeasurementsRepository(db);
+                                const count = await repo.fixDateFormats();
+                                Alert.alert("Success", `Fixed ${count} date records.`);
+                            } catch (e: any) {
+                                Alert.alert("Error", e.message);
+                            }
+                        }} 
+                        variant="outline"
+                        style={{marginTop: 16}}
+                    />
+
+                    <Button 
+                        title={t.settings.exportCsv} 
+                        onPress={handleExportCsv} 
+                        variant="secondary"
+                        style={{marginTop: 16}}
+                    />
+
+                    <View style={{ marginTop: 24, borderTopWidth: 1, borderTopColor: colors.surfaceHighlight, paddingTop: 16 }}>
+                         <Button 
+                            title={t.settings.deleteAll} 
+                            onPress={() => {
+                                Alert.alert(
+                                    t.settings.deleteAllConfirmTitle,
+                                    t.settings.deleteAllConfirmMessage,
+                                    [
+                                        { text: t.addEntry.cancel, style: 'cancel' },
+                                        { 
+                                            text: t.addEntry.delete, 
+                                            style: 'destructive', 
+                                            onPress: async () => {
+                                                try {
+                                                    const repo = new MeasurementsRepository(db);
+                                                    await repo.deleteAll();
+                                                    Alert.alert(t.common.success, t.settings.deletionSuccess);
+                                                } catch (e: any) {
+                                                    console.error(e);
+                                                    Alert.alert(t.common.error, 'Failed to delete records');
+                                                }
                                             }
                                         }
-                                    }
-                                ]
-                            );
-                        }}
-                        style={{ backgroundColor: colors.error, paddingVertical: 14, paddingHorizontal: 24, borderRadius: 12, alignItems: 'center' }}
-                    >
-                        <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>{t.settings.deleteAll}</Text>
-                    </TouchableOpacity>
-                </View>
+                                    ]
+                                );
+                            }}
+                            variant="primary"
+                            style={{ backgroundColor: colors.error }}
+                        />
+                    </View>
+                </Card>
 
                  <Card>
                     <Text style={sectionTitleStyle}>{t.settings.about}</Text>

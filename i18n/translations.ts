@@ -43,6 +43,9 @@ export const translations = {
     settings: {
       title: 'Options',
       dataManagement: 'Data Management',
+      exportCsv: 'Export CSV',
+      exportSuccess: 'Export Successful',
+      exportError: 'Failed to export CSV',
       importCsv: 'Import CSV',
       importCsvDesc: 'Import your history from a file.',
       csvFormatTitle: 'Expected Format:',
@@ -126,6 +129,9 @@ export const translations = {
     settings: {
       title: 'Opciones',
       dataManagement: 'Gestión de Datos',
+      exportCsv: 'Exportar CSV',
+      exportSuccess: 'Exportación Exitosa',
+      exportError: 'Error al exportar CSV',
       importCsv: 'Importar CSV',
       importCsvDesc: 'Importa tu historial desde un archivo.',
       csvFormatTitle: 'Formato Esperado:',
