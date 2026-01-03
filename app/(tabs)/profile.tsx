@@ -1,11 +1,10 @@
-import { useRouter } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import React, { useEffect, useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-
 import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { WeightPickerDialog } from '@/components/WeightPickerDialog';
 import { useTheme } from '@/context/ThemeContext';
@@ -14,34 +13,32 @@ import { useI18n } from '@/i18n/I18nContext';
 
 export default function ProfileScreen() {
   const db = useSQLiteContext();
-  const router = useRouter();
   const { t } = useI18n();
   const { colors } = useTheme();
 
   const [height, setHeight] = useState('');
-  const [sex, setSex] = useState('');
+  const [sex, setSex] = useState<'M' | 'F' | ''>('');
   const [targetWeight, setTargetWeight] = useState('');
   const [loading, setLoading] = useState(false);
   const [showTargetWeightPicker, setShowTargetWeightPicker] = useState(false);
 
   useEffect(() => {
+    const loadSettings = async () => {
+        try {
+          const repo = new SettingsRepository(db);
+          const savedHeight = await repo.getSetting('height');
+          const savedSex = await repo.getSetting('sex');
+          const savedTarget = await repo.getSetting('targetWeight');
+          
+          if (savedHeight) setHeight(savedHeight);
+          if (savedSex) setSex(savedSex as 'M' | 'F');
+          if (savedTarget) setTargetWeight(savedTarget);
+        } catch (e) {
+          console.error('Failed to load settings', e);
+        }
+    };
     loadSettings();
-  }, []);
-
-  const loadSettings = async () => {
-    try {
-      const repo = new SettingsRepository(db);
-      const savedHeight = await repo.getSetting('height');
-      const savedSex = await repo.getSetting('sex');
-      const savedTarget = await repo.getSetting('targetWeight');
-      
-      if (savedHeight) setHeight(savedHeight);
-      if (savedSex) setSex(savedSex);
-      if (savedTarget) setTargetWeight(savedTarget);
-    } catch (e) {
-      console.error('Failed to load settings', e);
-    }
-  };
+  }, [db]);
 
   const handleSave = async () => {
     if (!height) {
@@ -69,6 +66,8 @@ export default function ProfileScreen() {
   const containerStyle = { flex: 1, backgroundColor: colors.background };
   const titleStyle = { color: colors.text, ...styles.title };
   const subtitleStyle = { color: colors.textSecondary, ...styles.subtitle };
+  const labelStyle = { color: colors.textSecondary, fontSize: 13, marginBottom: 6, fontWeight: '500' as const };
+  const valueStyle = { color: colors.text, fontSize: 16, fontWeight: '600' as const };
 
   return (
     <SafeAreaView style={containerStyle} edges={['top']}>
@@ -80,57 +79,91 @@ export default function ProfileScreen() {
           <Text style={titleStyle}>{t.profile.title}</Text>
           <Text style={subtitleStyle}>{t.profile.subtitle}</Text>
           
-          <View style={styles.form}>
-            <Input
-              label={t.profile.height}
-              placeholder="e.g. 175"
-              keyboardType="numeric"
-              value={height}
-              onChangeText={setHeight}
-              maxLength={3}
-            />
-            
-            {/* Target Weight Picker */}
-            <View style={{ marginBottom: 16 }}>
-                <Text style={{ ...styles.subtitle, color: colors.text, marginBottom: 8, fontSize: 14, fontWeight: '500' }}>{t.profile.targetWeight}</Text>
-                 <TouchableOpacity 
-                    onPress={() => setShowTargetWeightPicker(true)}
-                    style={{ 
-                        padding: 16, 
-                        borderWidth: 1, 
-                        borderColor: colors.border, 
-                        borderRadius: 8,
-                        backgroundColor: colors.surface
-                    }}
-                 >
-                    <Text style={{ fontSize: 18, color: colors.text }}>
-                        {targetWeight ? `${targetWeight} kg` : t.profile.targetWeight}
-                    </Text>
-                 </TouchableOpacity>
+          <Card>
+            <View style={styles.formGrid}>
+                {/* Row 1: Height & Sex */}
+                <View style={styles.row}>
+                    <View style={{ flex: 1, paddingRight: 8 }}>
+                         <Text style={labelStyle}>{t.profile.height}</Text>
+                         <View style={[styles.inputContainer, { backgroundColor: colors.surfaceHighlight, borderColor: colors.border }]}>
+                            <Input
+                                placeholder="175"
+                                keyboardType="numeric"
+                                value={height}
+                                onChangeText={setHeight}
+                                maxLength={3}
+                                style={{ borderWidth: 0, backgroundColor: 'transparent', padding: 0, height: 24, fontSize: 16, color: colors.text }}
+                                placeholderTextColor={colors.textSecondary}
+                            />
+                         </View>
+                    </View>
 
-                 <WeightPickerDialog
-                    visible={showTargetWeightPicker}
-                    initialValue={targetWeight ? parseFloat(targetWeight) : 70.0}
-                    onClose={() => setShowTargetWeightPicker(false)}
-                    onSave={(val) => setTargetWeight(val.toString())}
-                 />
+                    <View style={{ flex: 1, paddingLeft: 8 }}>
+                        <Text style={labelStyle}>{t.profile.sex}</Text>
+                        <View style={styles.sexSelector}>
+                            <TouchableOpacity 
+                                onPress={() => setSex('M')}
+                                style={[
+                                    styles.sexOption, 
+                                    { 
+                                        backgroundColor: sex === 'M' ? colors.primary : colors.surfaceHighlight,
+                                        borderTopLeftRadius: 8,
+                                        borderBottomLeftRadius: 8,
+                                    }
+                                ]}
+                            >
+                                <Text style={{ color: sex === 'M' ? '#FFF' : colors.textSecondary, fontWeight: '600' }}>M</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity 
+                                onPress={() => setSex('F')}
+                                style={[
+                                    styles.sexOption, 
+                                    { 
+                                        backgroundColor: sex === 'F' ? colors.primary : colors.surfaceHighlight,
+                                        borderTopRightRadius: 8,
+                                        borderBottomRightRadius: 8,
+                                    }
+                                ]}
+                            >
+                                <Text style={{ color: sex === 'F' ? '#FFF' : colors.textSecondary, fontWeight: '600' }}>F</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+
+                {/* Divider Line */}
+                <View style={{ height: 1, backgroundColor: colors.border, marginVertical: 16, opacity: 0.5 }} />
+
+                {/* Row 2: Target Weight */}
+                <View>
+                    <Text style={labelStyle}>{t.profile.targetWeight}</Text>
+                     <TouchableOpacity 
+                        onPress={() => setShowTargetWeightPicker(true)}
+                        style={[styles.targetInput, { backgroundColor: colors.surfaceHighlight, borderColor: colors.border }]}
+                     >
+                        <Text style={valueStyle}>
+                            {targetWeight ? `${targetWeight} kg` : t.profile.targetWeight}
+                        </Text>
+                        <Text style={{ fontSize: 12, color: colors.primary }}>Edit</Text>
+                     </TouchableOpacity>
+
+                     <WeightPickerDialog
+                        visible={showTargetWeightPicker}
+                        initialValue={targetWeight ? parseFloat(targetWeight) : 70.0}
+                        onClose={() => setShowTargetWeightPicker(false)}
+                        onSave={(val) => setTargetWeight(val.toString())}
+                     />
+                </View>
             </View>
+          </Card>
 
-            <Input
-              label={t.profile.sex}
-              placeholder="e.g. M"
-              value={sex}
-              onChangeText={setSex}
-              maxLength={1}
-            />
+          <Button 
+            title={t.profile.save} 
+            onPress={handleSave} 
+            loading={loading}
+            style={{ marginTop: 24 }}
+          />
 
-            <Button 
-              title={t.profile.save} 
-              onPress={handleSave} 
-              loading={loading}
-              style={{ marginTop: 20 }}
-            />
-          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -145,15 +178,48 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28, // Slightly reduced
     fontWeight: 'bold',
     marginBottom: 8,
+    marginLeft: 4,
   },
   subtitle: {
-    fontSize: 16,
-    marginBottom: 32,
+    fontSize: 14,
+    marginBottom: 24,
+    marginLeft: 4,
+    opacity: 0.8
   },
-  form: {
-    gap: 16,
+  formGrid: {
+     paddingVertical: 8
   },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'flex-end', 
+  },
+  inputContainer: {
+      borderRadius: 8,
+      borderWidth: 1,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      height: 44,
+      justifyContent: 'center'
+  },
+  sexSelector: {
+      flexDirection: 'row',
+      height: 44,
+  },
+  sexOption: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+  },
+  targetInput: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      borderRadius: 8,
+      borderWidth: 1,
+      paddingHorizontal: 12,
+      height: 48,
+  }
 });
