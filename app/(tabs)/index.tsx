@@ -160,9 +160,9 @@ export default function HomeScreen() {
   const cardTitleStyle = { ...styles.cardTitle, color: colors.text };
   
   // Compact stats
-  const statLabelStyle = { fontSize: 10, color: colors.textSecondary, marginBottom: 2 };
-  const statValueStyle = { fontSize: 15, fontWeight: '700' as const, color: colors.text };
-  const unitStyle = { fontSize: 10, fontWeight: 'normal' as const, color: colors.textSecondary };
+  const statLabelStyle = { fontSize: 9, color: colors.textSecondary, marginBottom: 0 };
+  const statValueStyle = { fontSize: 14, fontWeight: '700' as const, color: colors.text };
+  const unitStyle = { fontSize: 9, fontWeight: 'normal' as const, color: colors.textSecondary };
   const getChangeColor = (val: number) => val > 0 ? colors.error : colors.success;
 
   return (
@@ -293,7 +293,7 @@ export default function HomeScreen() {
                         <Card style={styles.gridCard}>
                             <Text style={statLabelStyle}>{t.home.startWeight}</Text>
                             <Text style={statValueStyle}>{data[0].weight} <Text style={unitStyle}>kg</Text></Text>
-                            <Text style={{ fontSize: 10, color: colors.textSecondary, marginTop: 2 }}>{formatDate(data[0].date)}</Text>
+                            <Text style={{ fontSize: 9, color: colors.textSecondary, marginTop: 0 }}>{formatDate(data[0].date)}</Text>
                         </Card>
                         
                         {(() => {
@@ -304,12 +304,12 @@ export default function HomeScreen() {
                                     <Card style={styles.gridCard}>
                                         <Text style={statLabelStyle}>{t.home.maxWeight}</Text>
                                         <Text style={statValueStyle}>{maxRecord.weight} <Text style={unitStyle}>kg</Text></Text>
-                                        <Text style={{ fontSize: 10, color: colors.textSecondary, marginTop: 2 }}>{formatDate(maxRecord.date)}</Text>
+                                        <Text style={{ fontSize: 9, color: colors.textSecondary, marginTop: 0 }}>{formatDate(maxRecord.date)}</Text>
                                     </Card>
                                     <Card style={styles.gridCard}>
                                         <Text style={statLabelStyle}>{t.home.minWeight}</Text>
                                         <Text style={statValueStyle}>{minRecord.weight} <Text style={unitStyle}>kg</Text></Text>
-                                        <Text style={{ fontSize: 10, color: colors.textSecondary, marginTop: 2 }}>{formatDate(minRecord.date)}</Text>
+                                        <Text style={{ fontSize: 9, color: colors.textSecondary, marginTop: 0 }}>{formatDate(minRecord.date)}</Text>
                                     </Card>
                                 </>
                              );
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
   content: {
     padding: 16,
     paddingTop: 8,
-    paddingBottom: 120, // Add bottom padding to avoid tab bar overlap
+    paddingBottom: 85, // Add bottom padding to avoid tab bar overlap
   },
   headerTitle: {
     fontSize: 26,
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   gridCard: {
       flex: 1, 
       minWidth: '28%', // Allow 3 columns (approx 30%)
-      padding: 10,
+      padding: 6,
       justifyContent: 'center',
       alignItems: 'center', // Center align content for 3-col
   },

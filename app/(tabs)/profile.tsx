@@ -92,7 +92,7 @@ export default function ProfileScreen() {
                                 value={height}
                                 onChangeText={setHeight}
                                 maxLength={3}
-                                style={{ borderWidth: 0, backgroundColor: 'transparent', padding: 0, height: 24, fontSize: 16, color: colors.text }}
+                                style={{ borderWidth: 0, backgroundColor: 'transparent', padding: 0, height: 30, fontSize: 16, color: colors.text, marginTop: 15}}
                                 placeholderTextColor={colors.textSecondary}
                             />
                          </View>
