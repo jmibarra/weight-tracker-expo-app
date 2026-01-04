@@ -11,25 +11,13 @@ interface WeightData {
 
 interface WeightChartProps {
   data: WeightData[];
+  trendData?: WeightData[];
   targetWeight?: number;
 }
 
-export const WeightChart = ({ data, targetWeight }: WeightChartProps) => {
+export const WeightChart = ({ data, trendData, targetWeight }: WeightChartProps) => {
   const { colors } = useTheme();
 
-    // ... inside pointerLabelComponent or where date is shown
-    // The LineChart library might handle axis labels differently. 
-    // Let's see how `label` is passed in `data`. 
-    // In index.tsx, we pass `label: m.date.slice(5)`. This is "MM-DD" hardcoded.
-    // We should probably pass the FULL date or ISO string to the chart data, 
-    // and let the chart format it using our formatter?
-    // OR we format it differently in index.tsx?
-    
-    // Actually, `m.date.slice(5)` in index.tsx means the X-axis shows "MM-DD".
-    // If the user selects "dd/MM", showing "MM-DD" might be confusing?
-    // But usually charts show short dates.
-    
-    // Let's stick to checking `WeightChart.tsx` first.
   const screenWidth = Dimensions.get('window').width;
 
   if (data.length === 0) {
@@ -50,14 +38,19 @@ export const WeightChart = ({ data, targetWeight }: WeightChartProps) => {
     <View style={{ overflow: 'hidden', paddingBottom: 10 }}>
     <LineChart
       data={data}
+      data2={trendData}
       color={colors.primary}
+      color2={colors.textSecondary}
       thickness={3}
+      thickness2={2}
       dataPointsColor={colors.secondary}
+      dataPointsColor2="transparent"
       selectionColor={colors.secondary}
       startFillColor={colors.primary}
       endFillColor={colors.primary}
       startOpacity={0.3}
       endOpacity={0.1}
+      strokeDashArray2={[5, 5]}
       areaChart
       yAxisTextStyle={{ color: colors.textSecondary }}
       xAxisTextStyle={{ color: colors.textSecondary, fontSize: 10 }}
@@ -74,6 +67,7 @@ export const WeightChart = ({ data, targetWeight }: WeightChartProps) => {
       textFontSize={12}
       textColor={colors.text}
       hideDataPoints={false}
+      hideDataPoints2={true}
       pointerConfig={{
         pointerStripHeight: 160,
         pointerStripColor: colors.secondary,

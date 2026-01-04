@@ -62,7 +62,10 @@ export const translations = {
       deleteAllConfirmTitle: 'Delete All History',
       deleteAllConfirmMessage: 'Are you sure you want to delete all records? This action cannot be undone.',
       deletionSuccess: 'All records have been deleted.',
-      dateFormat: 'Date Format'
+      dateFormat: 'Date Format',
+      appearanceSettings: 'Appearance Settings',
+      theme: 'Theme',
+      showTrendLine: 'Show Trend Line'
     },
     addEntry: {
       title: 'New Entry',
@@ -148,7 +151,10 @@ export const translations = {
       deleteAllConfirmTitle: 'Eliminar Todo',
       deleteAllConfirmMessage: '¿Estás seguro de que quieres eliminar todos los registros? Esta acción no se puede deshacer.',
       deletionSuccess: 'Todos los registros han sido eliminados.',
-      dateFormat: 'Formato de Fecha'
+      dateFormat: 'Formato de Fecha',
+      appearanceSettings: 'Ajustes de Apariencia',
+      theme: 'Tema',
+      showTrendLine: 'Mostrar Línea de Tendencia'
     },
     addEntry: {
       title: 'Nueva Entrada',

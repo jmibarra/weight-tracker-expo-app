@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import { useSQLiteContext } from 'expo-sqlite';
 import React from 'react';
-import { Alert, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Platform, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useTheme } from '@/context/ThemeContext';
 import { MeasurementsRepository } from '@/db/repositories/MeasurementsRepository';
+import { SettingsRepository } from '@/db/repositories/SettingsRepository';
 import { useI18n } from '@/i18n/I18nContext';
 
 export default function OptionsScreen() {
@@ -21,6 +22,24 @@ export default function OptionsScreen() {
     const db = useSQLiteContext();
     const { t, locale, setLocale, dateFormat, setDateFormat } = useI18n();
     const { theme, setTheme, colors } = useTheme();
+    const [showTrendLine, setShowTrendLine] = React.useState(true);
+
+    React.useEffect(() => {
+        const loadSettings = async () => {
+             const repo = new SettingsRepository(db);
+             const val = await repo.getSetting('showTrendLine');
+             if (val !== null) {
+                 setShowTrendLine(val === 'true');
+             }
+        };
+        loadSettings();
+    }, [db]);
+
+    const toggleTrendLine = async (value: boolean) => {
+        setShowTrendLine(value);
+        const repo = new SettingsRepository(db);
+        await repo.setSetting('showTrendLine', String(value));
+    };
 
     const handleImportCsv = async () => {
         try {
@@ -195,8 +214,11 @@ export default function OptionsScreen() {
             <ScrollView contentContainerStyle={styles.content}>
                 
                 <Card>
-                    <Text style={sectionTitleStyle}>{t.settings.language}</Text>
-                     <View style={styles.langRow}>
+                    <Text style={sectionTitleStyle}>{t.settings.appearanceSettings}</Text>
+                    
+                    {/* Language Section */}
+                    <Text style={[textStyle, { fontWeight: '600', marginTop: 8, marginBottom: 8 }]}>{t.settings.language}</Text>
+                    <View style={styles.langRow}>
                         <TouchableOpacity onPress={toggleLanguage} style={buttonStyle}>
                             <Text style={buttonTextStyle}>
                                 {locale === 'en' ? '🇺🇸 English' : '🇪🇸 Español'}
@@ -205,10 +227,13 @@ export default function OptionsScreen() {
                         <Text style={subtextStyle}>
                             {t.settings.selectLanguage}
                         </Text>
-                     </View>
-                </Card>
-                <Card>
-                    <Text style={sectionTitleStyle}>{t.settings.dateFormat || "Date Format"}</Text>
+                    </View>
+
+                    {/* Separator */}
+                    <View style={{ height: 1, backgroundColor: colors.border, marginVertical: 16 }} />
+
+                    {/* Date Format Section */}
+                    <Text style={[textStyle, { fontWeight: '600', marginBottom: 8 }]}>{t.settings.dateFormat}</Text>
                     <View style={styles.themeRow}>
                         <TouchableOpacity 
                             style={[
@@ -245,15 +270,32 @@ export default function OptionsScreen() {
                             </Text>
                         </TouchableOpacity>
                     </View>
-                </Card>
 
-                <Card>
-                    <Text style={sectionTitleStyle}>{t.settings.appearance || "Appearance"}</Text>
+                    {/* Separator */}
+                    <View style={{ height: 1, backgroundColor: colors.border, marginVertical: 16 }} />
+
+                    {/* Theme Section */}
+                    <Text style={[textStyle, { fontWeight: '600', marginBottom: 8 }]}>{t.settings.theme}</Text>
                     <View style={styles.themeRow}>
                         <ThemeOption value="light" label="Light" />
                         <ThemeOption value="dark" label="Dark" />
                         <ThemeOption value="system" label="System" />
                     </View>
+
+                    {/* Separator */}
+                    <View style={{ height: 1, backgroundColor: colors.border, marginVertical: 16 }} />
+
+                    {/* Trend Line Toggle */}
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                         <Text style={[textStyle, { fontWeight: '600' }]}>{t.settings.showTrendLine}</Text>
+                         <Switch
+                            value={showTrendLine}
+                            onValueChange={toggleTrendLine}
+                            trackColor={{ false: colors.surfaceHighlight, true: colors.primary }}
+                            thumbColor={Platform.OS === 'ios' ? '#fff' : colors.primary}
+                         />
+                    </View>
+
                 </Card>
 
                 <Card>

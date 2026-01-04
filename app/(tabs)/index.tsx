@@ -51,7 +51,7 @@ export default function HomeScreen() {
           filtered = filtered.filter((_, index) => index % step === 0 || index === filtered.length - 1);
       }
       
-      return filtered.map(m => {
+      const lineData = filtered.map(m => {
             const day = m.date.slice(8, 10);
             const month = m.date.slice(5, 7);
             const label = dateFormat.startsWith('dd') ? `${day}/${month}` : `${month}/${day}`;
@@ -60,23 +60,66 @@ export default function HomeScreen() {
                 value: m.weight,
                 label: label,
                 dataPointText: m.weight.toString(),
+                date: m.date // Keep full date for sorting if needed
             };
       });
+
+      return { lineData, filteredRaw: filtered };
   };
 
-  const filteredChartData = getFilteredData();
+  const { lineData: filteredChartData, filteredRaw } = getFilteredData();
+
+  // Simple Moving Average Calculation
+  const calculateMovingAverage = (data: Measurement[], windowSize: number) => {
+      if (data.length < windowSize) return [];
+      
+      const maData = [];
+      for (let i = 0; i < data.length; i++) {
+          if (i < windowSize - 1) {
+             // For the first N-1 points, we can't calculate a full window MA.
+             // Option 1: Null/Empty (line starts later) - Preferred for accuracy
+             // Option 2: Average of available points (cumulative)
+             
+             // Let's use cumulative average for the start to avoid gaps? 
+             // Or just fill with null? 'gifted-charts' might handle nulls or we just skip.
+             // Let's calculate partial average for smoother start.
+             let sum = 0;
+             for (let j = 0; j <= i; j++) sum += data[j].weight;
+             maData.push({ value: sum / (i + 1) });
+          } else {
+             let sum = 0;
+             for (let j = 0; j < windowSize; j++) {
+                 sum += data[i - j].weight;
+             }
+             maData.push({ value: sum / windowSize });
+          }
+      }
+      return maData;
+  };
+
+  // Determine window size based on range
+  let windowSize = 0;
+  if (range === '1W') windowSize = 3;
+  if (range === '1M') windowSize = 5;
+  if (range === '1Y') windowSize = 7;
+  // 'all' -> 0 (no trend line requested/needed usually, or maybe 10?)
+
+  const trendLineData = windowSize > 0 ? calculateMovingAverage(filteredRaw, windowSize) : undefined;
+  
+  const [showTrendLine, setShowTrendLine] = useState(true);
 
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-        console.log('Loading dashboard data...');
         const repo = new MeasurementsRepository(db);
         const settingsRepo = new SettingsRepository(db);
         
         const measurements = await repo.getMeasurementsForChart(); // Ascending for chart
         const target = await settingsRepo.getSetting('targetWeight');
+        const showTrend = await settingsRepo.getSetting('showTrendLine');
         
         if (target) setTargetWeight(parseFloat(target));
+        if (showTrend !== null) setShowTrendLine(showTrend === 'true');
         
         setData(measurements);
 
@@ -209,7 +252,11 @@ export default function HomeScreen() {
             </View>
             
             {filteredChartData.length > 0 ? (
-                 <WeightChart data={filteredChartData} targetWeight={targetWeight > 0 ? targetWeight : undefined} />
+                 <WeightChart 
+                    data={filteredChartData} 
+                    trendData={showTrendLine ? trendLineData : undefined}
+                    targetWeight={targetWeight > 0 ? targetWeight : undefined} 
+                />
             ) : (
                 <View style={{ height: 180, justifyContent: 'center', alignItems: 'center', width: '100%' }}>
                     <Text style={{ color: colors.textSecondary }}>{t.home.noChartData}</Text>
