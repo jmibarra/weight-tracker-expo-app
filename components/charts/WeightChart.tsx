@@ -38,7 +38,7 @@ export const WeightChart = ({ data, trendData, targetWeight }: WeightChartProps)
     <View style={{ overflow: 'hidden', paddingBottom: 10 }}>
     <LineChart
       data={data}
-      data2={trendData}
+      data2={trendData && trendData.length > 0 ? trendData : undefined}
       color={colors.primary}
       color2={colors.textSecondary}
       thickness={3}
