@@ -160,7 +160,7 @@ export default function HomeScreen() {
   const cardTitleStyle = { ...styles.cardTitle, color: colors.text };
   
   // Compact stats
-  const statLabelStyle = { fontSize: 9, color: colors.textSecondary, marginBottom: 0 };
+  const statLabelStyle = { fontSize: 11, fontWeight: '600' as const, color: colors.textSecondary, marginBottom: 2 };
   const statValueStyle = { fontSize: 14, fontWeight: '700' as const, color: colors.text };
   const unitStyle = { fontSize: 9, fontWeight: 'normal' as const, color: colors.textSecondary };
   const getChangeColor = (val: number) => val > 0 ? colors.error : colors.success;
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
   content: {
     padding: 16,
     paddingTop: 8,
-    paddingBottom: 85, // Add bottom padding to avoid tab bar overlap
+    paddingBottom: 20, // Add bottom padding to avoid tab bar overlap
   },
   headerTitle: {
     fontSize: 26,
@@ -361,14 +361,14 @@ const styles = StyleSheet.create({
   },
   badge: {
      paddingVertical: 3,
-     paddingHorizontal: 6,
-     borderRadius: 6,
+     paddingHorizontal: 10,
+     borderRadius: 8,
      alignSelf: 'center',
      marginBottom: 6, 
   },
   badgeText: {
-      fontWeight: '700',
-      fontSize: 11,
+      fontWeight: '800',
+      fontSize: 13,
   },
   chartCard: {
     marginBottom: 12,
@@ -387,9 +387,10 @@ const styles = StyleSheet.create({
   },
   gridCard: {
       flex: 1, 
-      minWidth: '28%', // Allow 3 columns (approx 30%)
-      padding: 6,
+      minWidth: '30%', // Allow 3 columns (approx 30%)
+      padding: 5,
       justifyContent: 'center',
       alignItems: 'center', // Center align content for 3-col
+      height: 70,
   },
 });
