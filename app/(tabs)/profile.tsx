@@ -278,7 +278,11 @@ export default function ProfileScreen() {
                         },
                       ]}
                     >
-                      {achievement.title}
+                      {
+                        t.achievements[
+                          achievement.id as keyof typeof t.achievements
+                        ].title
+                      }
                     </Text>
                     <Text
                       style={[

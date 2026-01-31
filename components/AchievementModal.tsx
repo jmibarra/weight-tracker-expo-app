@@ -1,5 +1,6 @@
 import { Achievement } from "@/constants/Achievements";
 import { useTheme } from "@/context/ThemeContext";
+import { useI18n } from "@/i18n/I18nContext";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useEffect } from "react";
 import { Modal, StyleSheet, Text, View } from "react-native";
@@ -7,7 +8,7 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue,
     withSequence,
-    withSpring
+    withSpring,
 } from "react-native-reanimated";
 import { Button } from "./ui/Button";
 
@@ -23,6 +24,7 @@ export const AchievementModal = ({
   onClose,
 }: AchievementModalProps) => {
   const { colors } = useTheme();
+  const { t } = useI18n();
   const scale = useSharedValue(0);
 
   useEffect(() => {
@@ -51,7 +53,7 @@ export const AchievementModal = ({
       <View style={styles.overlay}>
         <View style={[styles.card, { backgroundColor: colors.surface }]}>
           <Text style={[styles.congratsText, { color: colors.primary }]}>
-            ¡Felicidades!
+            {t.common.congratulations}
           </Text>
 
           <Animated.View
@@ -69,13 +71,23 @@ export const AchievementModal = ({
           </Animated.View>
 
           <Text style={[styles.title, { color: colors.text }]}>
-            {achievement.title}
+            {
+              t.achievements[achievement.id as keyof typeof t.achievements]
+                .title
+            }
           </Text>
           <Text style={[styles.description, { color: colors.textSecondary }]}>
-            {achievement.description}
+            {
+              t.achievements[achievement.id as keyof typeof t.achievements]
+                .description
+            }
           </Text>
 
-          <Button title="Continuar" onPress={onClose} style={styles.button} />
+          <Button
+            title={t.common.continue}
+            onPress={onClose}
+            style={styles.button}
+          />
         </View>
       </View>
     </Modal>
