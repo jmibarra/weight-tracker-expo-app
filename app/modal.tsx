@@ -20,7 +20,11 @@ import { AchievementModal } from "@/components/AchievementModal";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { WeightPickerDialog } from "@/components/WeightPickerDialog";
-import { Achievement, REGISTRY_ACHIEVEMENTS } from "@/constants/Achievements";
+import {
+  Achievement,
+  REGISTRY_ACHIEVEMENTS,
+  WEIGHT_LOSS_ACHIEVEMENTS,
+} from "@/constants/Achievements";
 import { useTheme } from "@/context/ThemeContext";
 import { MeasurementsRepository } from "@/db/repositories/MeasurementsRepository";
 import { SettingsRepository } from "@/db/repositories/SettingsRepository";
@@ -162,16 +166,50 @@ export default function ModalScreen() {
         // Check for achievements BEFORE navigating back
         await repo.addMeasurement(data);
 
-        // Get new count
-        const newCount = await repo.count();
+        // Get new data for checking
+        // We use check logic here.
+        const measurements = await repo.getMeasurementsForChart();
+        let unlocked: Achievement | undefined;
 
-        // Check if matches any target
-        const achievement = REGISTRY_ACHIEVEMENTS.find(
-          (a) => a.targetCount === newCount,
-        );
+        // 1. Check Weight Loss (Priority)
+        if (measurements.length > 0) {
+          const startWeight = measurements[0].weight;
+          const currentIsoDate = toIsoDateString(date);
+          const addedWeight = parseFloat(weight);
 
-        if (achievement) {
-          setUnlockedAchievement(achievement);
+          // Find the entry we just added.
+          // Note: If multiple entries exist for same date/weight, we take the last one (most likely the new one or consistent).
+          // Actually, for "crossing" check, using the logical position in time is correct.
+          const currentIndex = measurements.findIndex(
+            (m) => m.date === currentIsoDate && m.weight === addedWeight,
+          );
+
+          if (currentIndex >= 0) {
+            const currentLoss = startWeight - addedWeight;
+            let prevLoss = 0;
+
+            if (currentIndex > 0) {
+              const prevRecord = measurements[currentIndex - 1];
+              prevLoss = startWeight - prevRecord.weight;
+            }
+
+            // Check if we CROSSED a threshold this time
+            unlocked = WEIGHT_LOSS_ACHIEVEMENTS.find(
+              (a) => prevLoss < a.targetCount && currentLoss >= a.targetCount,
+            );
+          }
+        }
+
+        // 2. Check Registry Count (if no weight loss unlock)
+        if (!unlocked) {
+          const newCount = measurements.length;
+          unlocked = REGISTRY_ACHIEVEMENTS.find(
+            (a) => a.targetCount === newCount,
+          );
+        }
+
+        if (unlocked) {
+          setUnlockedAchievement(unlocked);
           setShowAchievementParams(true);
         } else {
           router.back();

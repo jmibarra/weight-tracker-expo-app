@@ -4,6 +4,7 @@ import { useSQLiteContext } from "expo-sqlite";
 import React, { useState } from "react";
 import {
   Alert,
+  Dimensions,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -18,7 +19,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { WeightPickerDialog } from "@/components/WeightPickerDialog";
-import { REGISTRY_ACHIEVEMENTS } from "@/constants/Achievements";
+import { Achievement, ALL_ACHIEVEMENTS } from "@/constants/Achievements";
 import { useTheme } from "@/context/ThemeContext";
 import { MeasurementsRepository } from "@/db/repositories/MeasurementsRepository";
 import { SettingsRepository } from "@/db/repositories/SettingsRepository";
@@ -35,6 +36,7 @@ export default function ProfileScreen() {
   const [loading, setLoading] = useState(false);
   const [showTargetWeightPicker, setShowTargetWeightPicker] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
+  const [totalWeightLost, setTotalWeightLost] = useState(0);
 
   /* Reactividad: usar useFocusEffect para recargar al volver a la pantalla */
   useFocusEffect(
@@ -53,6 +55,15 @@ export default function ProfileScreen() {
           const measurementsRepo = new MeasurementsRepository(db);
           const count = await measurementsRepo.count();
           setTotalRecords(count);
+
+          const measurements = await measurementsRepo.getMeasurementsForChart();
+          if (measurements.length > 0) {
+            const startWeight = measurements[0].weight;
+            const currentWeight = measurements[measurements.length - 1].weight;
+            setTotalWeightLost(startWeight - currentWeight);
+          } else {
+            setTotalWeightLost(0);
+          }
         } catch (e) {
           console.error("Failed to load settings", e);
         }
@@ -82,6 +93,38 @@ export default function ProfileScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const isAchievementUnlocked = (achievement: Achievement) => {
+    if (achievement.type === "registry") {
+      return totalRecords >= achievement.targetCount;
+    } else if (achievement.type === "weight_loss") {
+      return totalWeightLost >= achievement.targetCount;
+    }
+    return false;
+  };
+
+  const handleAchievementPress = (achievement: Achievement) => {
+    const isUnlocked = isAchievementUnlocked(achievement);
+    const title =
+      t.achievements[achievement.id as keyof typeof t.achievements]?.title ||
+      achievement.id;
+    const description =
+      t.achievements[achievement.id as keyof typeof t.achievements]
+        ?.description || "";
+
+    const progressValue =
+      achievement.type === "registry"
+        ? totalRecords
+        : totalWeightLost.toFixed(1);
+    const unit =
+      achievement.type === "registry" ? t.achievements.records : "kg";
+
+    Alert.alert(
+      title,
+      `${description}\n\n${t.achievements.progress}: ${progressValue}/${achievement.targetCount} ${unit}`,
+      [{ text: t.common.ok }],
+    );
   };
 
   const containerStyle = { flex: 1, backgroundColor: colors.background };
@@ -240,63 +283,178 @@ export default function ProfileScreen() {
             </View>
           </Card>
 
-          <Text style={[subtitleStyle, { marginTop: 32, marginBottom: 16 }]}>
-            Logros
+          <Text
+            style={[
+              titleStyle,
+              { fontSize: 22, marginTop: 24, marginBottom: 12 },
+            ]}
+          >
+            {t.achievements.sectionTitle}
           </Text>
-          <Card>
-            <View style={styles.achievementsGrid}>
-              {REGISTRY_ACHIEVEMENTS.map((achievement) => {
-                const isUnlocked = totalRecords >= achievement.targetCount;
-                return (
-                  <View key={achievement.id} style={styles.achievementItem}>
-                    <View
-                      style={[
-                        styles.achievementIconContainer,
-                        {
-                          backgroundColor: isUnlocked
-                            ? colors.primary + "20"
-                            : colors.surfaceHighlight,
-                        },
-                      ]}
-                    >
-                      <MaterialCommunityIcons
-                        name={achievement.icon}
-                        size={28}
-                        color={
-                          isUnlocked ? colors.primary : colors.textSecondary
-                        }
-                        style={{ opacity: isUnlocked ? 1 : 0.5 }}
-                      />
-                    </View>
-                    <Text
-                      style={[
-                        styles.achievementTitle,
-                        {
-                          color: isUnlocked
-                            ? colors.text
-                            : colors.textSecondary,
-                        },
-                      ]}
-                    >
-                      {
-                        t.achievements[
-                          achievement.id as keyof typeof t.achievements
-                        ].title
-                      }
-                    </Text>
-                    <Text
-                      style={[
-                        styles.achievementDesc,
-                        { color: colors.textSecondary },
-                      ]}
-                    >
-                      {achievement.targetCount} regs.
-                    </Text>
-                  </View>
-                );
-              })}
+
+          <ScrollView
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            style={{ marginHorizontal: -24 }} // Negative margin to span full width
+            contentContainerStyle={{ paddingHorizontal: 0 }} // Remove padding from content
+          >
+            {/* Slide 1: Registry */}
+            <View
+              style={{
+                width: Dimensions.get("window").width,
+                paddingHorizontal: 24,
+              }}
+            >
+              <Text
+                style={[
+                  subtitleStyle,
+                  { marginTop: 16, marginBottom: 8, textAlign: "center" },
+                ]}
+              >
+                {t.achievements.registryTitle}
+              </Text>
+              <Card>
+                <View style={styles.achievementsGrid}>
+                  {ALL_ACHIEVEMENTS.filter((a) => a.type === "registry").map(
+                    (achievement) => {
+                      const isUnlocked = isAchievementUnlocked(achievement);
+                      return (
+                        <TouchableOpacity
+                          key={achievement.id}
+                          style={styles.achievementItem}
+                          onPress={() => handleAchievementPress(achievement)}
+                        >
+                          <View
+                            style={[
+                              styles.achievementIconContainer,
+                              {
+                                backgroundColor: isUnlocked
+                                  ? colors.primary + "20"
+                                  : colors.surfaceHighlight,
+                              },
+                            ]}
+                          >
+                            <MaterialCommunityIcons
+                              name={achievement.icon}
+                              size={28}
+                              color={
+                                isUnlocked
+                                  ? colors.primary
+                                  : colors.textSecondary
+                              }
+                              style={{ opacity: isUnlocked ? 1 : 0.5 }}
+                            />
+                          </View>
+                          <Text
+                            style={[
+                              styles.achievementTitle,
+                              {
+                                color: isUnlocked
+                                  ? colors.text
+                                  : colors.textSecondary,
+                              },
+                            ]}
+                            numberOfLines={1}
+                          >
+                            {t.achievements[
+                              achievement.id as keyof typeof t.achievements
+                            ]?.title || achievement.id}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.achievementDesc,
+                              { color: colors.textSecondary },
+                            ]}
+                          >
+                            {achievement.targetCount} regs.
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    },
+                  )}
+                </View>
+              </Card>
             </View>
-          </Card>
+
+            {/* Slide 2: Weight Loss */}
+            <View
+              style={{
+                width: Dimensions.get("window").width,
+                paddingHorizontal: 24,
+              }}
+            >
+              <Text
+                style={[
+                  subtitleStyle,
+                  { marginTop: 16, marginBottom: 8, textAlign: "center" },
+                ]}
+              >
+                {t.achievements.weightLossTitle}
+              </Text>
+              <Card>
+                <View style={styles.achievementsGrid}>
+                  {ALL_ACHIEVEMENTS.filter((a) => a.type === "weight_loss").map(
+                    (achievement) => {
+                      const isUnlocked = isAchievementUnlocked(achievement);
+                      return (
+                        <TouchableOpacity
+                          key={achievement.id}
+                          style={styles.achievementItem}
+                          onPress={() => handleAchievementPress(achievement)}
+                        >
+                          <View
+                            style={[
+                              styles.achievementIconContainer,
+                              {
+                                backgroundColor: isUnlocked
+                                  ? colors.primary + "20"
+                                  : colors.surfaceHighlight,
+                              },
+                            ]}
+                          >
+                            <MaterialCommunityIcons
+                              name={achievement.icon}
+                              size={28}
+                              color={
+                                isUnlocked
+                                  ? colors.primary
+                                  : colors.textSecondary
+                              }
+                              style={{ opacity: isUnlocked ? 1 : 0.5 }}
+                            />
+                          </View>
+                          <Text
+                            style={[
+                              styles.achievementTitle,
+                              {
+                                color: isUnlocked
+                                  ? colors.text
+                                  : colors.textSecondary,
+                              },
+                            ]}
+                            numberOfLines={1}
+                          >
+                            {t.achievements[
+                              achievement.id as keyof typeof t.achievements
+                            ]?.title || achievement.id}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.achievementDesc,
+                              { color: colors.textSecondary },
+                            ]}
+                          >
+                            -{achievement.targetCount} kg
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    },
+                  )}
+                </View>
+              </Card>
+            </View>
+          </ScrollView>
 
           <Button
             title={t.profile.save}

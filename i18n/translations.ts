@@ -95,6 +95,7 @@ export const translations = {
       success: "Success",
       congratulations: "Congratulations!",
       continue: "Continue",
+      ok: "OK",
     },
     achievements: {
       records_1: {
@@ -129,6 +130,18 @@ export const translations = {
         title: "Legend",
         description: "500 records logged",
       },
+      loss_1: { title: "First Drop", description: "Lost 1 kg" },
+      loss_3: { title: "Getting Lighter", description: "Lost 3 kg" },
+      loss_5: { title: "High Five", description: "Lost 5 kg" },
+      loss_10: { title: "Incredible", description: "Lost 10 kg" },
+      loss_20: { title: "Life Changer", description: "Lost 20 kg" },
+      loss_30: { title: "Transformation", description: "Lost 30 kg" },
+      loss_40: { title: "The New You", description: "Lost 40 kg" },
+      progress: "Progress",
+      sectionTitle: "Achievements",
+      records: "records",
+      registryTitle: "Registry Milestones",
+      weightLossTitle: "Weight Loss Milestones",
     },
   },
   es: {
@@ -227,6 +240,7 @@ export const translations = {
       success: "Éxito",
       congratulations: "¡Felicidades!",
       continue: "Continuar",
+      ok: "OK",
     },
     achievements: {
       records_1: {
@@ -261,6 +275,18 @@ export const translations = {
         title: "Leyenda",
         description: "500 registros realizados",
       },
+      loss_1: { title: "Primer Paso", description: "Bajaste 1 kg" },
+      loss_3: { title: "Tomando Impulso", description: "Bajaste 3 kg" },
+      loss_5: { title: "Choca esos 5", description: "Bajaste 5 kg" },
+      loss_10: { title: "Increíble", description: "Bajaste 10 kg" },
+      loss_20: { title: "Cambio de Vida", description: "Bajaste 20 kg" },
+      loss_30: { title: "Transformación", description: "Bajaste 30 kg" },
+      loss_40: { title: "Nuevo Tú", description: "Bajaste 40 kg" },
+      progress: "Progreso",
+      sectionTitle: "Logros",
+      records: "registros",
+      registryTitle: "Hitos de Registro",
+      weightLossTitle: "Pérdida de Peso",
     },
   },
 };
