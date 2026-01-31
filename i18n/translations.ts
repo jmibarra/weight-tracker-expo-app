@@ -68,6 +68,12 @@ export const translations = {
       theme: "Theme",
       showTrendLine: "Show Trend Line",
     },
+    streaks: {
+      current: "Current Streak",
+      longest: "Best Streak",
+      days: "days",
+      record: "Record!",
+    },
     addEntry: {
       title: "New Entry",
       editTitle: "Edit Entry",
@@ -193,6 +199,12 @@ export const translations = {
       appearanceSettings: "Ajustes de Apariencia",
       theme: "Tema",
       showTrendLine: "Mostrar Línea de Tendencia",
+    },
+    streaks: {
+      current: "Racha Actual",
+      longest: "Mejor Racha",
+      days: "días",
+      record: "¡Récord!",
     },
     addEntry: {
       title: "Nueva Entrada",
