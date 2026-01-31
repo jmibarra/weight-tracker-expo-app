@@ -1,15 +1,16 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useFocusEffect } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -35,27 +36,30 @@ export default function ProfileScreen() {
   const [showTargetWeightPicker, setShowTargetWeightPicker] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
 
-  useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        const repo = new SettingsRepository(db);
-        const savedHeight = await repo.getSetting("height");
-        const savedSex = await repo.getSetting("sex");
-        const savedTarget = await repo.getSetting("targetWeight");
+  /* Reactividad: usar useFocusEffect para recargar al volver a la pantalla */
+  useFocusEffect(
+    React.useCallback(() => {
+      const loadSettings = async () => {
+        try {
+          const repo = new SettingsRepository(db);
+          const savedHeight = await repo.getSetting("height");
+          const savedSex = await repo.getSetting("sex");
+          const savedTarget = await repo.getSetting("targetWeight");
 
-        if (savedHeight) setHeight(savedHeight);
-        if (savedSex) setSex(savedSex as "M" | "F");
-        if (savedTarget) setTargetWeight(savedTarget);
+          if (savedHeight) setHeight(savedHeight);
+          if (savedSex) setSex(savedSex as "M" | "F");
+          if (savedTarget) setTargetWeight(savedTarget);
 
-        const measurementsRepo = new MeasurementsRepository(db);
-        const count = await measurementsRepo.count();
-        setTotalRecords(count);
-      } catch (e) {
-        console.error("Failed to load settings", e);
-      }
-    };
-    loadSettings();
-  }, [db]);
+          const measurementsRepo = new MeasurementsRepository(db);
+          const count = await measurementsRepo.count();
+          setTotalRecords(count);
+        } catch (e) {
+          console.error("Failed to load settings", e);
+        }
+      };
+      loadSettings();
+    }, [db]),
+  );
 
   const handleSave = async () => {
     if (!height) {
