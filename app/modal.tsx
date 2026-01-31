@@ -1,19 +1,19 @@
 import DateTimePicker, {
-    DateTimePickerEvent,
+  DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import { AchievementModal } from "@/components/AchievementModal";
@@ -43,7 +43,6 @@ export default function ModalScreen() {
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const [loading, setLoading] = useState(false);
-  const [userHeight, setUserHeight] = useState<number | null>(null);
   const [userHeight, setUserHeight] = useState<number | null>(null);
   const [editId, setEditId] = useState<number | null>(null);
   const [showWeightPicker, setShowWeightPicker] = useState(false);
@@ -161,7 +160,6 @@ export default function ModalScreen() {
         router.back();
       } else {
         // Check for achievements BEFORE navigating back
-        // Count includes the new one we are about to add? No, we add it first.
         await repo.addMeasurement(data);
 
         // Get new count
@@ -175,7 +173,6 @@ export default function ModalScreen() {
         if (achievement) {
           setUnlockedAchievement(achievement);
           setShowAchievementParams(true);
-          // Don't navigate back yet. Wait for modal close.
         } else {
           router.back();
         }
