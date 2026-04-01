@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { MeasurementsChartModal } from "@/components/charts/MeasurementsChartModal";
 import { WeightChart } from "@/components/charts/WeightChart";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -30,6 +31,7 @@ export default function HomeScreen() {
   const { colors } = useTheme();
 
   const [data, setData] = useState<Measurement[]>([]);
+  const [isMeasurementsModalVisible, setMeasurementsModalVisible] = useState(false);
   const [latest, setLatest] = useState<Measurement | null>(null);
   const [previous, setPrevious] = useState<Measurement | null>(null);
   const [targetWeight, setTargetWeight] = useState<number>(0);
@@ -480,7 +482,12 @@ export default function HomeScreen() {
               width: "100%",
             }}
           >
-            <Text style={cardTitleStyle}>{t.home.trend}</Text>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <Text style={cardTitleStyle}>{t.home.trend}</Text>
+              <TouchableOpacity onPress={() => setMeasurementsModalVisible(true)}>
+                <MaterialCommunityIcons name="tape-measure" size={20} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
             <View style={{ flexDirection: "row", gap: 6 }}>
               {(["all", "1Y", "1M", "1W"] as const).map((r) => (
                 <TouchableOpacity
@@ -644,6 +651,11 @@ export default function HomeScreen() {
           </View>
         )}
       </ScrollView>
+      <MeasurementsChartModal
+        visible={isMeasurementsModalVisible}
+        onClose={() => setMeasurementsModalVisible(false)}
+        data={filteredRaw}
+      />
     </SafeAreaView>
   );
 }

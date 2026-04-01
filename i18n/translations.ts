@@ -22,11 +22,15 @@ export const translations = {
       noChartData: "No records for this period.",
       vsLastRecord: "vs last record",
       tabTitle: "Home",
+      measurementsChartTitle: "Measurements Evolution",
     },
     history: {
       title: "History",
       empty: "No history available.",
       tabTitle: "History",
+      waistAbbr: "W:",
+      hipAbbr: "H:",
+      legsAbbr: "L:",
     },
     profile: {
       title: "Profile",
@@ -167,11 +171,15 @@ export const translations = {
       noChartData: "No hay registros para este periodo.",
       vsLastRecord: "vs último registro",
       tabTitle: "Inicio",
+      measurementsChartTitle: "Evolución de Medidas",
     },
     history: {
       title: "Historial",
       empty: "No hay historial disponible.",
       tabTitle: "Historial",
+      waistAbbr: "C:",
+      hipAbbr: "Ca:",
+      legsAbbr: "P:",
     },
     profile: {
       title: "Perfil",

@@ -78,9 +78,9 @@ export default function HistoryScreen() {
 
                     <Text style={subtextStyle}>
                         {[
-                            item.waist ? `W:${item.waist}` : '',
-                            item.hip ? `H:${item.hip}` : '',
-                            item.legs ? `L:${item.legs}` : ''
+                            item.waist ? `${t.history.waistAbbr}${item.waist}` : '',
+                            item.hip ? `${t.history.hipAbbr}${item.hip}` : '',
+                            item.legs ? `${t.history.legsAbbr}${item.legs}` : ''
                         ].filter(Boolean).join(' | ')}
                     </Text>
                 </View>
