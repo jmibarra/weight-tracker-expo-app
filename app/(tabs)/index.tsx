@@ -81,18 +81,34 @@ export default function HomeScreen() {
       );
     }
 
-    const lineData = filtered.map((m) => {
+    const lineData = filtered.map((m, index) => {
+      const currentYear = m.date.slice(0, 4);
+      const prevYear =
+        index > 0 ? filtered[index - 1].date.slice(0, 4) : currentYear;
+      const isYearChange = currentYear !== prevYear && range === "all";
+
       const day = m.date.slice(8, 10);
       const month = m.date.slice(5, 7);
-      const label = dateFormat.startsWith("dd")
+
+      let label = dateFormat.startsWith("dd")
         ? `${day}/${month}`
         : `${month}/${day}`;
+
+      if (isYearChange) {
+        label = currentYear;
+      }
 
       return {
         value: m.weight,
         label: label,
         dataPointText: m.weight.toString(),
         date: m.date, // Keep full date for sorting if needed
+        showVerticalLine: isYearChange,
+        verticalLineColor: isYearChange ? colors.primary : undefined, // Make it pop a bit more or use border
+        verticalLineThickness: isYearChange ? 1 : undefined,
+        labelTextStyle: isYearChange
+          ? { fontWeight: "bold" as const, color: colors.text }
+          : undefined,
       };
     });
 
@@ -308,6 +324,88 @@ export default function HomeScreen() {
                   {" "}
                   {t.home.vsLastRecord}
                 </Text>
+              </View>
+            )}
+
+            {/* Progress Bar */}
+            {targetWeight > 0 && data.length > 0 && (
+              <View
+                style={{
+                  marginTop: 16,
+                  paddingTop: 16,
+                  borderTopWidth: 1,
+                  borderTopColor: colors.border,
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    marginBottom: 8,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      color: colors.textSecondary,
+                      fontWeight: "600",
+                    }}
+                  >
+                    {t.home.target}: {targetWeight} kg
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      color: colors.primary,
+                      fontWeight: "700",
+                    }}
+                  >
+                    {(() => {
+                      const start = data[0].weight;
+                      const current = latest.weight;
+                      const target = targetWeight;
+                      if (start === target) return "100%";
+                      let progress = 0;
+                      if (start > target) {
+                        progress = (start - current) / (start - target);
+                      } else {
+                        progress = (current - start) / (target - start);
+                      }
+                      progress = Math.max(0, Math.min(1, progress));
+                      return `${Math.round(progress * 100)}%`;
+                    })()}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    height: 8,
+                    backgroundColor: colors.border,
+                    borderRadius: 4,
+                    overflow: "hidden",
+                  }}
+                >
+                  <View
+                    style={{
+                      height: "100%",
+                      backgroundColor: colors.primary,
+                      borderRadius: 4,
+                      width: (() => {
+                        const start = data[0].weight;
+                        const current = latest.weight;
+                        const target = targetWeight;
+                        if (start === target) return "100%";
+                        let progress = 0;
+                        if (start > target) {
+                          progress = (start - current) / (start - target);
+                        } else {
+                          progress = (current - start) / (target - start);
+                        }
+                        progress = Math.max(0, Math.min(1, progress));
+                        return `${progress * 100}%` as any;
+                      })(),
+                    }}
+                  />
+                </View>
               </View>
             )}
           </Card>
