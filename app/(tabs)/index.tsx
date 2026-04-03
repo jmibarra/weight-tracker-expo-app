@@ -31,7 +31,8 @@ export default function HomeScreen() {
   const { colors } = useTheme();
 
   const [data, setData] = useState<Measurement[]>([]);
-  const [isMeasurementsModalVisible, setMeasurementsModalVisible] = useState(false);
+  const [isMeasurementsModalVisible, setMeasurementsModalVisible] =
+    useState(false);
   const [latest, setLatest] = useState<Measurement | null>(null);
   const [previous, setPrevious] = useState<Measurement | null>(null);
   const [targetWeight, setTargetWeight] = useState<number>(0);
@@ -67,6 +68,11 @@ export default function HomeScreen() {
       });
     }
 
+    const timeFiltered = [...filtered];
+    const measurementsData = timeFiltered.filter(
+      (m) => m.waist || m.hip || m.legs,
+    );
+
     // Sampling for large datasets (prevent crash on 'all')
     if (filtered.length > 50) {
       const step = Math.ceil(filtered.length / 50);
@@ -90,10 +96,14 @@ export default function HomeScreen() {
       };
     });
 
-    return { lineData, filteredRaw: filtered };
+    return { lineData, filteredRaw: filtered, measurementsData };
   };
 
-  const { lineData: filteredChartData, filteredRaw } = getFilteredData();
+  const {
+    lineData: filteredChartData,
+    filteredRaw,
+    measurementsData,
+  } = getFilteredData();
 
   // Simple Moving Average Calculation
   const calculateMovingAverage = (data: Measurement[], windowSize: number) => {
@@ -482,10 +492,18 @@ export default function HomeScreen() {
               width: "100%",
             }}
           >
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+            >
               <Text style={cardTitleStyle}>{t.home.trend}</Text>
-              <TouchableOpacity onPress={() => setMeasurementsModalVisible(true)}>
-                <MaterialCommunityIcons name="tape-measure" size={20} color={colors.primary} />
+              <TouchableOpacity
+                onPress={() => setMeasurementsModalVisible(true)}
+              >
+                <MaterialCommunityIcons
+                  name="tape-measure"
+                  size={20}
+                  color={colors.primary}
+                />
               </TouchableOpacity>
             </View>
             <View style={{ flexDirection: "row", gap: 6 }}>
@@ -654,7 +672,7 @@ export default function HomeScreen() {
       <MeasurementsChartModal
         visible={isMeasurementsModalVisible}
         onClose={() => setMeasurementsModalVisible(false)}
-        data={filteredRaw}
+        data={measurementsData}
       />
     </SafeAreaView>
   );
