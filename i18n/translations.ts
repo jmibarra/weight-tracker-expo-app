@@ -2,7 +2,7 @@ export const translations = {
   en: {
     home: {
       title: "Dashboard",
-      trend: "Weight Trend",
+      trend: "Weight",
       currentWeight: "Current Weight",
       target: "Target",
       toGo: "To Go",
@@ -151,7 +151,7 @@ export const translations = {
   es: {
     home: {
       title: "Panel Principal",
-      trend: "Tendencia de Peso",
+      trend: "Peso",
       currentWeight: "Peso Actual",
       target: "Objetivo",
       toGo: "Faltan",

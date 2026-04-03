@@ -37,7 +37,7 @@ export default function HomeScreen() {
   const [previous, setPrevious] = useState<Measurement | null>(null);
   const [targetWeight, setTargetWeight] = useState<number>(0);
   const [loading, setLoading] = useState(false);
-  const [range, setRange] = useState<"all" | "1Y" | "1M" | "1W">("1W");
+  const [range, setRange] = useState<"all" | "1Y" | "YTD" | "1M" | "1W">("1W");
   const [streaks, setStreaks] = useState<{
     currentStreak: number;
     longestStreak: number;
@@ -57,6 +57,7 @@ export default function HomeScreen() {
       let limitDate = new Date();
 
       if (range === "1Y") limitDate.setFullYear(now.getFullYear() - 1);
+      if (range === "YTD") limitDate.setMonth(0, 1);
       if (range === "1M") limitDate.setMonth(now.getMonth() - 1);
       if (range === "1W") limitDate.setDate(now.getDate() - 7);
 
@@ -153,6 +154,7 @@ export default function HomeScreen() {
   let windowSize = 0;
   if (range === "1W") windowSize = 3;
   if (range === "1M") windowSize = 5;
+  if (range === "YTD") windowSize = 6;
   if (range === "1Y") windowSize = 7;
   // 'all' -> 0 (no trend line requested/needed usually, or maybe 10?)
 
@@ -605,13 +607,13 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </View>
             <View style={{ flexDirection: "row", gap: 6 }}>
-              {(["all", "1Y", "1M", "1W"] as const).map((r) => (
+              {(["all", "1Y", "YTD", "1M", "1W"] as const).map((r) => (
                 <TouchableOpacity
                   key={r}
                   onPress={() => setRange(r)}
                   style={{
                     paddingVertical: 4,
-                    paddingHorizontal: 10,
+                    paddingHorizontal: 8,
                     borderRadius: 16,
                     backgroundColor:
                       range === r ? colors.primary : colors.surfaceHighlight,
@@ -620,7 +622,7 @@ export default function HomeScreen() {
                   <Text
                     style={{
                       color: range === r ? "#fff" : colors.textSecondary,
-                      fontSize: 11,
+                      fontSize: 10,
                       fontWeight: "600",
                     }}
                   >
@@ -628,6 +630,7 @@ export default function HomeScreen() {
                       {
                         all: t.home.ranges.all,
                         "1Y": t.home.ranges.year,
+                        YTD: "YTD",
                         "1M": t.home.ranges.month,
                         "1W": t.home.ranges.week,
                       }[r]
