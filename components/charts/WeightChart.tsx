@@ -53,7 +53,6 @@ export const WeightChart = ({
         thickness2={2}
         dataPointsColor={colors.secondary}
         dataPointsColor2="transparent"
-        selectionColor={colors.secondary}
         startFillColor={colors.primary}
         endFillColor={colors.primary}
         startOpacity={0.3}
@@ -61,7 +60,7 @@ export const WeightChart = ({
         strokeDashArray2={[5, 5]}
         areaChart
         yAxisTextStyle={{ color: colors.textSecondary }}
-        xAxisTextStyle={{ color: colors.textSecondary, fontSize: 10 }}
+        xAxisLabelTextStyle={{ color: colors.textSecondary, fontSize: 10 }}
         noOfSections={5}
         rulesColor={colors.border}
         rulesType="solid"
