@@ -45,6 +45,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="list.bullet" color={color} />,
         }}
       />
+      <Tabs.Screen
+        name="metrics"
+        options={{
+          title: t.metrics.tabTitle,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="chart.bar.fill" color={color} />,
+        }}
+      />
       
       {/* Central Add Button */}
       <Tabs.Screen
