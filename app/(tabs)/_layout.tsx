@@ -45,14 +45,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="list.bullet" color={color} />,
         }}
       />
-      <Tabs.Screen
-        name="metrics"
-        options={{
-          title: t.metrics.tabTitle,
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="chart.bar.fill" color={color} />,
-        }}
-      />
-      
+
       {/* Central Add Button */}
       <Tabs.Screen
         name="add_placeholder" // Dummy route name
@@ -85,17 +78,26 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
+        name="metrics"
+        options={{
+          title: t.metrics.tabTitle,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="chart.bar.fill" color={color} />,
+        }}
+      />
+
+      <Tabs.Screen
         name="profile"
         options={{
           title: t.profile.tabTitle,
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
         }}
       />
+      
       <Tabs.Screen
         name="settings"
         options={{
           title: t.settings.tabTitle,
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="gearshape.fill" color={color} />,
+          href: null, // Hides this from the bottom tab bar
         }}
       />
     </Tabs>

@@ -1,5 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import React, { useState } from "react";
 import {
@@ -15,6 +15,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { IconSymbol } from "@/components/ui/icon-symbol";
+
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -29,6 +31,7 @@ export default function ProfileScreen() {
   const db = useSQLiteContext();
   const { t } = useI18n();
   const { colors } = useTheme();
+  const router = useRouter();
 
   const [height, setHeight] = useState("");
   const [sex, setSex] = useState<"M" | "F" | "">("");
@@ -149,7 +152,12 @@ export default function ProfileScreen() {
         style={styles.keyboardView}
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          <Text style={titleStyle}>{t.profile.title}</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, paddingRight: 4 }}>
+            <Text style={[titleStyle, { marginBottom: 0 }]}>{t.profile.title}</Text>
+            <TouchableOpacity onPress={() => router.push('/settings')} style={{ padding: 4 }}>
+              <IconSymbol name="gearshape.fill" size={26} color={colors.textSecondary} />
+            </TouchableOpacity>
+          </View>
           <Text style={subtitleStyle}>{t.profile.subtitle}</Text>
 
           <Card>
