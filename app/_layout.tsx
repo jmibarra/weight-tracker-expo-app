@@ -11,15 +11,31 @@ import { I18nProvider } from '@/i18n/I18nContext';
 import { SQLiteProvider, useSQLiteContext } from 'expo-sqlite';
 import { useEffect } from 'react';
 
+import * as QuickActions from 'expo-quick-actions';
+import { useQuickActionRouting } from 'expo-quick-actions/router';
+
+// ... 
+
 export const unstable_settings = {
   anchor: '(tabs)',
 };
 
 function InnerLayout() {
+    useQuickActionRouting();
     const { isDark } = useTheme();
     const db = useSQLiteContext();
 
     useEffect(() => {
+        // Set Quick Actions
+        QuickActions.setItems([
+          {
+            id: 'add-weight',
+            title: 'Añadir Peso',
+            icon: 'compose',
+            params: { href: '/modal' },
+          }
+        ]);
+
         const runMigration = async () => {
             try {
                 const settingsRepo = new SettingsRepository(db);

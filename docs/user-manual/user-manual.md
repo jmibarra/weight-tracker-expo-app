@@ -43,6 +43,22 @@ El peso no siempre es toda la historia. Si también estás midiendo tallas de ro
 
 ---
 
+## 📈 5. Pestaña de Métricas Detalladas
+
+Para mantener el Dashboard limpio, la app incluye una **Pestaña de Métricas** dedicada al análisis a largo plazo:
+* **Comparador de Períodos:** Muestra de forma inmediata cómo te fue "Este mes vs el Mes Anterior" o "Este Año vs el Anterior". Navega por el historial con los botones de paginación y descubre tus bajadas de tallas y peso con porcentajes clarificados.
+* **Tendencia Semanal:** En lugar del ir y venir diario, esta gráfica agrupa todos tus pesos por semana permitiéndote ver una curva suavizada de progreso. _Detalle de color:_ Si lograste bajar la media respecto a la última semana, se pintará verde de alegría.
+
+---
+
+## ⚡ 6. Atajos (Quick Actions)
+
+Si tienes mucha prisa y solo quieres sumar tu peso al levantarte:
+* Mantén presionado (**Long Press**) el ícono de **Weight Tracker** en el escritorio/pantalla de inicio de tu celular celular (iOS o Android).
+* Automáticamente se desplegará un menú rápido desde donde puedes seleccionar **"Añadir Peso"**. Al hacerlo la aplicación "saltará" directamente hasta la ventana requerida simplificando tu mañana.
+
+---
+
 ## 💡 Trucos Rápidos
 * Para interactuar a fondo con un día puntual, mantén **presionada (Long Press)** en cualquier punto de los gráficos, ya sea peso o medidas, y podrás navegar deslizando tu dedo para conocer fechas intermedies puntuales.
 * La app recuerda en qué momento te quedaste, si te vas no temas perder lo cargado, y se recarga automáticamente. Tus datos persisten.
