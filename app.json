@@ -42,7 +42,20 @@
       ],
       "expo-sqlite",
       "@react-native-community/datetimepicker",
-      "expo-quick-actions"
+      [
+        "expo-quick-actions",
+        {
+          "androidIcons": {
+            "add_weight_icon": {
+              "foregroundImage": "./assets/images/quick-action-add.png",
+              "backgroundColor": "#6366F1"
+            }
+          },
+          "iosIcons": {
+            "add_weight_icon": "./assets/images/quick-action-add.png"
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

@@ -31,7 +31,7 @@ function InnerLayout() {
           {
             id: 'add-weight',
             title: 'Añadir Peso',
-            icon: 'compose',
+            icon: 'add_weight_icon',
             params: { href: '/modal' },
           }
         ]);
