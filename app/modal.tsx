@@ -64,6 +64,13 @@ export default function ModalScreen() {
 
   const navigation = useNavigation();
 
+  const toIsoDateString = (d: Date) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -153,12 +160,7 @@ export default function ModalScreen() {
     return unsubscribe;
   }, [navigation, hasUnsavedChanges, loading, t]);
 
-  const toIsoDateString = (d: Date) => {
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
+
 
   const handleDateChange = (
     event: DateTimePickerEvent,
