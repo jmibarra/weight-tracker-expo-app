@@ -2,7 +2,6 @@ import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useSQLiteContext } from "expo-sqlite";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import {
@@ -26,14 +25,13 @@ import {
   WEIGHT_LOSS_ACHIEVEMENTS,
 } from "@/constants/Achievements";
 import { useTheme } from "@/context/ThemeContext";
-import { MeasurementsRepository } from "@/db/repositories/MeasurementsRepository";
-import { SettingsRepository } from "@/db/repositories/SettingsRepository";
 import { useI18n } from "@/i18n/I18nContext";
 import { ImcCalculator } from "@/services/ImcCalculator";
 import { SETTINGS_KEYS } from "@/constants/SettingsKeys";
+import { useRepositories } from "@/hooks/useRepositories";
 
 export default function ModalScreen() {
-  const db = useSQLiteContext();
+  const { measurements: measurementsRepo, settings: settingsRepo } = useRepositories();
   const router = useRouter();
   const params = useLocalSearchParams();
   const { t, formatDate } = useI18n();
@@ -59,14 +57,12 @@ export default function ModalScreen() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const settingsRepo = new SettingsRepository(db);
         const h = await settingsRepo.getSetting(SETTINGS_KEYS.HEIGHT);
         if (h) setUserHeight(parseFloat(h));
 
         if (params.id) {
           const id = parseInt(params.id as string);
           setEditId(id);
-          const measurementsRepo = new MeasurementsRepository(db);
           const m = await measurementsRepo.getMeasurementById(id);
           if (m) {
             setWeight(m.weight.toString());
@@ -80,7 +76,6 @@ export default function ModalScreen() {
           }
         } else {
           // Create Mode: Init with latest weight or 70
-          const measurementsRepo = new MeasurementsRepository(db);
           const latest = await measurementsRepo.getLatestMeasurement();
           if (latest) {
             setWeight(latest.weight.toString());
@@ -93,7 +88,7 @@ export default function ModalScreen() {
       }
     };
     loadData();
-  }, [params.id, db]);
+  }, [params.id, measurementsRepo, settingsRepo]);
 
   const toIsoDateString = (d: Date) => {
     const year = d.getFullYear();
@@ -123,8 +118,7 @@ export default function ModalScreen() {
         onPress: async () => {
           try {
             setLoading(true);
-            const repo = new MeasurementsRepository(db);
-            await repo.deleteMeasurement(editId);
+            await measurementsRepo.deleteMeasurement(editId);
             router.back();
           } catch (e) {
             Alert.alert(t.common.error, String(e));
@@ -144,8 +138,6 @@ export default function ModalScreen() {
 
     setLoading(true);
     try {
-      const repo = new MeasurementsRepository(db);
-
       let bmi = 0;
       if (userHeight) {
         bmi = ImcCalculator.calculate(parseFloat(weight), userHeight);
@@ -161,15 +153,15 @@ export default function ModalScreen() {
       };
 
       if (editId) {
-        await repo.updateMeasurement({ ...data, id: editId });
+        await measurementsRepo.updateMeasurement({ ...data, id: editId });
         router.back();
       } else {
         // Check for achievements BEFORE navigating back
-        await repo.addMeasurement(data);
+        await measurementsRepo.addMeasurement(data);
 
         // Get new data for checking
         // We use check logic here.
-        const measurements = await repo.getMeasurementsForChart();
+        const measurements = await measurementsRepo.getMeasurementsForChart();
         let unlocked: Achievement | undefined;
 
         // 1. Check Weight Loss (Priority)

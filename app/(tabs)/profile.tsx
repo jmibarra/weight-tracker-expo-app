@@ -1,6 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useSQLiteContext } from "expo-sqlite";
 import React, { useState } from "react";
 import {
   Alert,
@@ -23,13 +22,13 @@ import { Input } from "@/components/ui/Input";
 import { WeightPickerDialog } from "@/components/WeightPickerDialog";
 import { Achievement, ALL_ACHIEVEMENTS } from "@/constants/Achievements";
 import { useTheme } from "@/context/ThemeContext";
-import { MeasurementsRepository } from "@/db/repositories/MeasurementsRepository";
-import { SettingsRepository } from "@/db/repositories/SettingsRepository";
+
 import { useI18n } from "@/i18n/I18nContext";
 import { SETTINGS_KEYS } from "@/constants/SettingsKeys";
+import { useRepositories } from "@/hooks/useRepositories";
 
 export default function ProfileScreen() {
-  const db = useSQLiteContext();
+  const { measurements: measurementsRepo, settings: settingsRepo } = useRepositories();
   const { t } = useI18n();
   const { colors } = useTheme();
   const router = useRouter();
@@ -47,16 +46,14 @@ export default function ProfileScreen() {
     React.useCallback(() => {
       const loadSettings = async () => {
         try {
-          const repo = new SettingsRepository(db);
-          const savedHeight = await repo.getSetting(SETTINGS_KEYS.HEIGHT);
-          const savedSex = await repo.getSetting(SETTINGS_KEYS.SEX);
-          const savedTarget = await repo.getSetting(SETTINGS_KEYS.TARGET_WEIGHT);
+          const savedHeight = await settingsRepo.getSetting(SETTINGS_KEYS.HEIGHT);
+          const savedSex = await settingsRepo.getSetting(SETTINGS_KEYS.SEX);
+          const savedTarget = await settingsRepo.getSetting(SETTINGS_KEYS.TARGET_WEIGHT);
 
           if (savedHeight) setHeight(savedHeight);
           if (savedSex) setSex(savedSex as "M" | "F");
           if (savedTarget) setTargetWeight(savedTarget);
 
-          const measurementsRepo = new MeasurementsRepository(db);
           const count = await measurementsRepo.count();
           setTotalRecords(count);
 
@@ -73,7 +70,7 @@ export default function ProfileScreen() {
         }
       };
       loadSettings();
-    }, [db]),
+    }, [settingsRepo, measurementsRepo]),
   );
 
   const handleSave = async () => {
@@ -84,11 +81,10 @@ export default function ProfileScreen() {
 
     setLoading(true);
     try {
-      const repo = new SettingsRepository(db);
-      await repo.setSetting(SETTINGS_KEYS.HEIGHT, height);
-      await repo.setSetting(SETTINGS_KEYS.SEX, sex);
+      await settingsRepo.setSetting(SETTINGS_KEYS.HEIGHT, height);
+      await settingsRepo.setSetting(SETTINGS_KEYS.SEX, sex);
       if (targetWeight) {
-        await repo.setSetting(SETTINGS_KEYS.TARGET_WEIGHT, targetWeight);
+        await settingsRepo.setSetting(SETTINGS_KEYS.TARGET_WEIGHT, targetWeight);
       }
       Alert.alert(t.common.success, t.profile.success);
     } catch (e) {

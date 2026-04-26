@@ -1,16 +1,16 @@
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useSQLiteContext } from 'expo-sqlite';
 import React, { useCallback, useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Card } from '@/components/ui/Card';
 import { useTheme } from '@/context/ThemeContext';
-import { Measurement, MeasurementsRepository } from '@/db/repositories/MeasurementsRepository';
+import { Measurement } from '@/db/repositories/MeasurementsRepository';
 import { useI18n } from '@/i18n/I18nContext';
+import { useRepositories } from '@/hooks/useRepositories';
 
 export default function HistoryScreen() {
-  const db = useSQLiteContext();
+  const { measurements: measurementsRepo } = useRepositories();
   const router = useRouter();
   const { t, formatDate } = useI18n();
   const { colors } = useTheme();
@@ -21,15 +21,14 @@ export default function HistoryScreen() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-        const repo = new MeasurementsRepository(db);
-        const measurements = await repo.getMeasurements(); // Descending order
+        const measurements = await measurementsRepo.getMeasurements();
         setData(measurements);
     } catch (e) {
         console.error(e);
     } finally {
         setLoading(false);
     }
-  }, [db]);
+  }, [measurementsRepo]);
 
   useFocusEffect(
     useCallback(() => {

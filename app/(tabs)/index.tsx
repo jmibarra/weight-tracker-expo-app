@@ -1,6 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useSQLiteContext } from "expo-sqlite";
 import React, { useCallback, useMemo, useState } from "react";
 import {
   RefreshControl,
@@ -19,14 +18,13 @@ import { Card } from "@/components/ui/Card";
 import { useTheme } from "@/context/ThemeContext";
 import {
   Measurement,
-  MeasurementsRepository,
 } from "@/db/repositories/MeasurementsRepository";
-import { SettingsRepository } from "@/db/repositories/SettingsRepository";
 import { useI18n } from "@/i18n/I18nContext";
 import { SETTINGS_KEYS } from "@/constants/SettingsKeys";
+import { useRepositories } from "@/hooks/useRepositories";
 
 export default function HomeScreen() {
-  const db = useSQLiteContext();
+  const { measurements: measurementsRepo, settings: settingsRepo } = useRepositories();
   const router = useRouter();
   const { t, formatDate, dateFormat } = useI18n();
   const { colors } = useTheme();
@@ -171,17 +169,14 @@ export default function HomeScreen() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const repo = new MeasurementsRepository(db);
-      const settingsRepo = new SettingsRepository(db);
-
-      const measurements = await repo.getMeasurementsForChart(); // Ascending for chart
+      const measurements = await measurementsRepo.getMeasurementsForChart(); // Ascendente para gráfico
       const target = await settingsRepo.getSetting(SETTINGS_KEYS.TARGET_WEIGHT);
       const showTrend = await settingsRepo.getSetting(SETTINGS_KEYS.SHOW_TREND_LINE);
 
       if (target) setTargetWeight(parseFloat(target));
       if (showTrend !== null) setShowTrendLine(showTrend === "true");
 
-      const streakData = await repo.getStreaks();
+      const streakData = await measurementsRepo.getStreaks();
       setStreaks(streakData);
 
       setData(measurements);
@@ -202,7 +197,7 @@ export default function HomeScreen() {
     } finally {
       setLoading(false);
     }
-  }, [db]);
+  }, [measurementsRepo, settingsRepo]);
 
   useFocusEffect(
     useCallback(() => {

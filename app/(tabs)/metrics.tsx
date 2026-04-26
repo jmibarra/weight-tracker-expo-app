@@ -1,18 +1,18 @@
 import { useFocusEffect } from "expo-router";
-import { useSQLiteContext } from "expo-sqlite";
 import React, { useCallback, useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useTheme } from "@/context/ThemeContext";
 import { useI18n } from "@/i18n/I18nContext";
-import { Measurement, MeasurementsRepository } from "@/db/repositories/MeasurementsRepository";
+import { Measurement } from "@/db/repositories/MeasurementsRepository";
 import { getWeeklyAverages, WeeklyAverageData } from "@/utils/metricsUtils";
 import { WeeklyBarChart } from "@/components/charts/WeeklyBarChart";
 import { PeriodComparatorCard } from "@/components/metrics/PeriodComparatorCard";
+import { useRepositories } from "@/hooks/useRepositories";
 
 export default function MetricsScreen() {
-  const db = useSQLiteContext();
+  const { measurements: measurementsRepo } = useRepositories();
   const { t } = useI18n();
   const { colors } = useTheme();
 
@@ -23,10 +23,7 @@ export default function MetricsScreen() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const repo = new MeasurementsRepository(db);
-      // Fetching all to be able to compute averages in comparator correctly.
-      // getMeasurementsForChart returns them chronologically (oldest to newest)
-      const data = await repo.getMeasurementsForChart();
+      const data = await measurementsRepo.getMeasurementsForChart();
       setMeasurements(data);
       setWeeklyData(getWeeklyAverages(data, 12)); // Show up to last 12 weeks
     } catch (e) {
@@ -34,7 +31,7 @@ export default function MetricsScreen() {
     } finally {
       setLoading(false);
     }
-  }, [db]);
+  }, [measurementsRepo]);
 
   useFocusEffect(
     useCallback(() => {

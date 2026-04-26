@@ -3,7 +3,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
 import { useRouter } from 'expo-router';
 import * as Sharing from 'expo-sharing';
-import { useSQLiteContext } from 'expo-sqlite';
+
 import React from 'react';
 import { Alert, Platform, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,33 +13,30 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useTheme } from '@/context/ThemeContext';
-import { MeasurementsRepository } from '@/db/repositories/MeasurementsRepository';
-import { SettingsRepository } from '@/db/repositories/SettingsRepository';
 import { useI18n } from '@/i18n/I18nContext';
 import { SETTINGS_KEYS } from '@/constants/SettingsKeys';
+import { useRepositories } from '@/hooks/useRepositories';
 
 export default function OptionsScreen() {
+    const { measurements: measurementsRepo, settings: settingsRepo } = useRepositories();
     const router = useRouter();
-    const db = useSQLiteContext();
     const { t, locale, setLocale, dateFormat, setDateFormat } = useI18n();
     const { theme, setTheme, colors } = useTheme();
     const [showTrendLine, setShowTrendLine] = React.useState(true);
 
     React.useEffect(() => {
         const loadSettings = async () => {
-             const repo = new SettingsRepository(db);
-             const val = await repo.getSetting(SETTINGS_KEYS.SHOW_TREND_LINE);
+             const val = await settingsRepo.getSetting(SETTINGS_KEYS.SHOW_TREND_LINE);
              if (val !== null) {
                  setShowTrendLine(val === 'true');
              }
         };
         loadSettings();
-    }, [db]);
+    }, [settingsRepo]);
 
     const toggleTrendLine = async (value: boolean) => {
         setShowTrendLine(value);
-        const repo = new SettingsRepository(db);
-        await repo.setSetting(SETTINGS_KEYS.SHOW_TREND_LINE, String(value));
+        await settingsRepo.setSetting(SETTINGS_KEYS.SHOW_TREND_LINE, String(value));
     };
 
     const handleImportCsv = async () => {
@@ -56,7 +53,7 @@ export default function OptionsScreen() {
             
             // Basic CSV parsing
             const lines = content.split('\n');
-            const repo = new MeasurementsRepository(db);
+            const repo = measurementsRepo;
             
             let count = 0;
             
@@ -129,8 +126,7 @@ export default function OptionsScreen() {
 
     const handleExportCsv = async () => {
         try {
-            const repo = new MeasurementsRepository(db);
-            const measurements = await repo.getMeasurements();
+            const measurements = await measurementsRepo.getMeasurements();
 
             if (measurements.length === 0) {
                  Alert.alert(t.common.error, t.settings.noDataToExport);
@@ -349,8 +345,7 @@ export default function OptionsScreen() {
                                             style: 'destructive', 
                                             onPress: async () => {
                                                 try {
-                                                    const repo = new MeasurementsRepository(db);
-                                                    await repo.deleteAll();
+                                                    await measurementsRepo.deleteAll();
                                                     Alert.alert(t.common.success, t.settings.deletionSuccess);
                                                 } catch (e: any) {
                                                     console.error(e);
