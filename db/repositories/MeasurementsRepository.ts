@@ -119,79 +119,70 @@ export class MeasurementsRepository {
     longestStreak: number;
     longestStreakEndDate: string | null;
   }> {
-    const result = await this.db.getAllAsync<{ date: string }>(
-      `SELECT DISTINCT date FROM measurements ORDER BY date ASC`,
-    );
+    const query = `
+      WITH distinct_dates AS (
+        SELECT DISTINCT date FROM measurements WHERE date IS NOT NULL
+      ),
+      grouped_dates AS (
+        SELECT 
+          date,
+          CAST(julianday(date) AS INTEGER) - row_number() OVER (ORDER BY date ASC) AS grp
+        FROM distinct_dates
+      ),
+      streaks AS (
+        SELECT 
+          COUNT(*) as streak_length,
+          MAX(date) as end_date
+        FROM grouped_dates
+        GROUP BY grp
+      )
+      SELECT streak_length, end_date 
+      FROM streaks 
+      ORDER BY end_date DESC
+    `;
 
-    if (!result || result.length === 0) {
+    try {
+      const result = await this.db.getAllAsync<{ streak_length: number; end_date: string }>(query);
+
+      if (!result || result.length === 0) {
+        return { currentStreak: 0, longestStreak: 0, longestStreakEndDate: null };
+      }
+
+      let longestStreak = 0;
+      let longestStreakEndDate: string | null = null;
+      let currentStreak = 0;
+
+      const toIsoDateString = (d: Date) => {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      };
+
+      const today = new Date();
+      const todayStr = toIsoDateString(today);
+
+      const yesterday = new Date();
+      yesterday.setDate(today.getDate() - 1);
+      const yesterdayStr = toIsoDateString(yesterday);
+
+      for (const row of result) {
+        if (row.streak_length > longestStreak) {
+          longestStreak = row.streak_length;
+          longestStreakEndDate = row.end_date;
+        }
+      }
+
+      // result is ordered by end_date DESC, so result[0] is the latest streak
+      const latestStreak = result[0];
+      if (latestStreak.end_date === todayStr || latestStreak.end_date === yesterdayStr) {
+        currentStreak = latestStreak.streak_length;
+      }
+
+      return { currentStreak, longestStreak, longestStreakEndDate };
+    } catch (e) {
+      console.warn("Error calculating streaks with SQL window functions:", e);
       return { currentStreak: 0, longestStreak: 0, longestStreakEndDate: null };
     }
-
-    let currentStreak = 0;
-    let longestStreak = 0;
-    let longestStreakEndDate = null;
-
-    let tempStreak = 0;
-    let prevDate: Date | null = null;
-    let lastDateProcessed: Date | null = null;
-
-    for (const row of result) {
-      // Assuming date is in YYYY-MM-DD format
-      const [year, month, day] = row.date.split("-").map(Number);
-      const currDate = new Date(year, month - 1, day); // Local time
-      lastDateProcessed = currDate;
-
-      if (prevDate) {
-        const diffTime = currDate.getTime() - prevDate.getTime();
-        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-
-        if (diffDays === 1) {
-          tempStreak++;
-        } else {
-          // Streak broken
-          if (tempStreak > longestStreak) {
-            longestStreak = tempStreak;
-            longestStreakEndDate = prevDate.toISOString().split("T")[0];
-          }
-          tempStreak = 1; // Reset to 1 (current day counts)
-        }
-      } else {
-        tempStreak = 1;
-      }
-
-      prevDate = currDate;
-    }
-
-    // Check last streak
-    if (tempStreak > longestStreak) {
-      longestStreak = tempStreak;
-      // Using normalized string from our manual date construction
-      if (prevDate) {
-        const y = prevDate.getFullYear();
-        const m = String(prevDate.getMonth() + 1).padStart(2, "0");
-        const d = String(prevDate.getDate()).padStart(2, "0");
-        longestStreakEndDate = `${y}-${m}-${d}`;
-      }
-    }
-
-    // Determine if current streak is active
-    // Active if last record is today or yesterday
-    const now = new Date();
-    // Reset hours to compare dates only
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-    // We used local time construction for lastDateProcessed above, so it's comparable
-    if (lastDateProcessed) {
-      const diffTime = today.getTime() - lastDateProcessed.getTime();
-      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-
-      if (diffDays <= 1) {
-        currentStreak = tempStreak;
-      } else {
-        currentStreak = 0;
-      }
-    }
-
-    return { currentStreak, longestStreak, longestStreakEndDate };
   }
 }
