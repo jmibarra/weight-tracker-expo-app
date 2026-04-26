@@ -11,6 +11,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  FlatList,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -318,66 +319,71 @@ export default function ProfileScreen() {
                 {t.achievements.registryTitle}
               </Text>
               <Card>
-                <View style={styles.achievementsGrid}>
-                  {ALL_ACHIEVEMENTS.filter((a) => a.type === "registry").map(
-                    (achievement) => {
-                      const isUnlocked = isAchievementUnlocked(achievement);
-                      return (
-                        <TouchableOpacity
-                          key={achievement.id}
-                          style={styles.achievementItem}
-                          onPress={() => handleAchievementPress(achievement)}
+                <FlatList
+                  data={ALL_ACHIEVEMENTS.filter((a) => a.type === "registry")}
+                  keyExtractor={(item) => item.id}
+                  numColumns={4}
+                  scrollEnabled={false}
+                  columnWrapperStyle={{ marginHorizontal: -8 }}
+                  renderItem={({ item: achievement }) => {
+                    const isUnlocked = isAchievementUnlocked(achievement);
+                    return (
+                      <TouchableOpacity
+                        style={styles.achievementItem}
+                        onPress={() => handleAchievementPress(achievement)}
+                      >
+                        <View
+                          style={[
+                            styles.achievementIconContainer,
+                            {
+                              backgroundColor: isUnlocked
+                                ? colors.primary + "20"
+                                : colors.surfaceHighlight,
+                            },
+                          ]}
                         >
-                          <View
-                            style={[
-                              styles.achievementIconContainer,
-                              {
-                                backgroundColor: isUnlocked
-                                  ? colors.primary + "20"
-                                  : colors.surfaceHighlight,
-                              },
-                            ]}
-                          >
-                            <MaterialCommunityIcons
-                              name={achievement.icon}
-                              size={28}
-                              color={
-                                isUnlocked
-                                  ? colors.primary
-                                  : colors.textSecondary
-                              }
-                              style={{ opacity: isUnlocked ? 1 : 0.5 }}
-                            />
-                          </View>
-                          <Text
-                            style={[
-                              styles.achievementTitle,
-                              {
-                                color: isUnlocked
-                                  ? colors.text
-                                  : colors.textSecondary,
-                              },
-                            ]}
-                            numberOfLines={1}
-                          >
-                            {(() => {
-                              const val = t.achievements[achievement.id as keyof typeof t.achievements];
-                              return typeof val === 'object' ? val.title : achievement.id;
-                            })()}
-                          </Text>
-                          <Text
-                            style={[
-                              styles.achievementDesc,
-                              { color: colors.textSecondary },
-                            ]}
-                          >
-                            {achievement.targetCount} {t.achievements.regsAbbr}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    },
-                  )}
-                </View>
+                          <MaterialCommunityIcons
+                            name={achievement.icon}
+                            size={28}
+                            color={
+                              isUnlocked ? colors.primary : colors.textSecondary
+                            }
+                            style={{ opacity: isUnlocked ? 1 : 0.5 }}
+                          />
+                        </View>
+                        <Text
+                          style={[
+                            styles.achievementTitle,
+                            {
+                              color: isUnlocked
+                                ? colors.text
+                                : colors.textSecondary,
+                            },
+                          ]}
+                          numberOfLines={1}
+                        >
+                          {(() => {
+                            const val =
+                              t.achievements[
+                                achievement.id as keyof typeof t.achievements
+                              ];
+                            return typeof val === "object"
+                              ? val.title
+                              : achievement.id;
+                          })()}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.achievementDesc,
+                            { color: colors.textSecondary },
+                          ]}
+                        >
+                          {achievement.targetCount} {t.achievements.regsAbbr}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  }}
+                />
               </Card>
             </View>
 
@@ -397,66 +403,71 @@ export default function ProfileScreen() {
                 {t.achievements.weightLossTitle}
               </Text>
               <Card>
-                <View style={styles.achievementsGrid}>
-                  {ALL_ACHIEVEMENTS.filter((a) => a.type === "weight_loss").map(
-                    (achievement) => {
-                      const isUnlocked = isAchievementUnlocked(achievement);
-                      return (
-                        <TouchableOpacity
-                          key={achievement.id}
-                          style={styles.achievementItem}
-                          onPress={() => handleAchievementPress(achievement)}
+                <FlatList
+                  data={ALL_ACHIEVEMENTS.filter((a) => a.type === "weight_loss")}
+                  keyExtractor={(item) => item.id}
+                  numColumns={4}
+                  scrollEnabled={false}
+                  columnWrapperStyle={{ marginHorizontal: -8 }}
+                  renderItem={({ item: achievement }) => {
+                    const isUnlocked = isAchievementUnlocked(achievement);
+                    return (
+                      <TouchableOpacity
+                        style={styles.achievementItem}
+                        onPress={() => handleAchievementPress(achievement)}
+                      >
+                        <View
+                          style={[
+                            styles.achievementIconContainer,
+                            {
+                              backgroundColor: isUnlocked
+                                ? colors.primary + "20"
+                                : colors.surfaceHighlight,
+                            },
+                          ]}
                         >
-                          <View
-                            style={[
-                              styles.achievementIconContainer,
-                              {
-                                backgroundColor: isUnlocked
-                                  ? colors.primary + "20"
-                                  : colors.surfaceHighlight,
-                              },
-                            ]}
-                          >
-                            <MaterialCommunityIcons
-                              name={achievement.icon}
-                              size={28}
-                              color={
-                                isUnlocked
-                                  ? colors.primary
-                                  : colors.textSecondary
-                              }
-                              style={{ opacity: isUnlocked ? 1 : 0.5 }}
-                            />
-                          </View>
-                          <Text
-                            style={[
-                              styles.achievementTitle,
-                              {
-                                color: isUnlocked
-                                  ? colors.text
-                                  : colors.textSecondary,
-                              },
-                            ]}
-                            numberOfLines={1}
-                          >
-                            {(() => {
-                              const val = t.achievements[achievement.id as keyof typeof t.achievements];
-                              return typeof val === 'object' ? val.title : achievement.id;
-                            })()}
-                          </Text>
-                          <Text
-                            style={[
-                              styles.achievementDesc,
-                              { color: colors.textSecondary },
-                            ]}
-                          >
-                            -{achievement.targetCount} kg
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    },
-                  )}
-                </View>
+                          <MaterialCommunityIcons
+                            name={achievement.icon}
+                            size={28}
+                            color={
+                              isUnlocked ? colors.primary : colors.textSecondary
+                            }
+                            style={{ opacity: isUnlocked ? 1 : 0.5 }}
+                          />
+                        </View>
+                        <Text
+                          style={[
+                            styles.achievementTitle,
+                            {
+                              color: isUnlocked
+                                ? colors.text
+                                : colors.textSecondary,
+                            },
+                          ]}
+                          numberOfLines={1}
+                        >
+                          {(() => {
+                            const val =
+                              t.achievements[
+                                achievement.id as keyof typeof t.achievements
+                              ];
+                            return typeof val === "object"
+                              ? val.title
+                              : achievement.id;
+                          })()}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.achievementDesc,
+                            { color: colors.textSecondary },
+                          ]}
+                        >
+                          -{achievement.targetCount} kg
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  }}
+                />
               </Card>
             </View>
           </ScrollView>
