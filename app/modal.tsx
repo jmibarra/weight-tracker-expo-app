@@ -271,7 +271,7 @@ export default function ModalScreen() {
                 }}
               >
                 <Text style={{ fontSize: 18, color: colors.text }}>
-                  {weight ? `${weight} kg` : "Seleccionar peso"}
+                  {weight ? `${weight} kg` : t.addEntry.selectWeight}
                 </Text>
               </TouchableOpacity>
 

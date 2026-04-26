@@ -43,6 +43,7 @@ export const translations = {
       validationHeight: "Please enter your height",
       targetWeight: "Target Weight (kg)",
       tabTitle: "Profile",
+      edit: "Edit",
     },
     settings: {
       title: "Options",
@@ -71,6 +72,14 @@ export const translations = {
       appearanceSettings: "Appearance Settings",
       theme: "Theme",
       showTrendLine: "Show Trend Line",
+      noDataToExport: "No data to export",
+      sharingNotAvailable: "Sharing is not available on this device",
+      themeLight: "Light",
+      themeDark: "Dark",
+      themeSystem: "System",
+      fixDates: "Fix Dates",
+      fixDatesSuccess: "date records fixed.",
+      deleteError: "Failed to delete records",
     },
     streaks: {
       current: "Current Streak",
@@ -93,6 +102,7 @@ export const translations = {
       validationWeight: "Weight is required",
       error: "Failed to save entry",
       confirmDelete: "Are you sure you want to delete this entry?",
+      selectWeight: "Select weight",
     },
     common: {
       error: "Error",
@@ -146,6 +156,7 @@ export const translations = {
       records: "records",
       registryTitle: "Registry Milestones",
       weightLossTitle: "Weight Loss Milestones",
+      regsAbbr: "recs.",
     },
     metrics: {
       tabTitle: "Metrics",
@@ -209,6 +220,7 @@ export const translations = {
       validationHeight: "Por favor ingresa tu altura",
       targetWeight: "Peso Objetivo (kg)",
       tabTitle: "Perfil",
+      edit: "Editar",
     },
     settings: {
       title: "Opciones",
@@ -237,6 +249,14 @@ export const translations = {
       appearanceSettings: "Ajustes de Apariencia",
       theme: "Tema",
       showTrendLine: "Mostrar Línea de Tendencia",
+      noDataToExport: "No hay datos para exportar",
+      sharingNotAvailable: "Compartir no está disponible en este dispositivo",
+      themeLight: "Claro",
+      themeDark: "Oscuro",
+      themeSystem: "Sistema",
+      fixDates: "Reparar Fechas",
+      fixDatesSuccess: "registros de fecha corregidos.",
+      deleteError: "Error al eliminar los registros",
     },
     streaks: {
       current: "Racha Actual",
@@ -259,6 +279,7 @@ export const translations = {
       validationWeight: "El peso es obligatorio",
       error: "Error al guardar la entrada",
       confirmDelete: "¿Estás seguro de que quieres eliminar esta entrada?",
+      selectWeight: "Seleccionar peso",
     },
     common: {
       error: "Error",
@@ -312,6 +333,7 @@ export const translations = {
       records: "registros",
       registryTitle: "Hitos de Registro",
       weightLossTitle: "Pérdida de Peso",
+      regsAbbr: "regs.",
     },
     metrics: {
       tabTitle: "Métricas",

@@ -277,7 +277,7 @@ export default function ProfileScreen() {
                       : t.profile.targetWeight}
                   </Text>
                   <Text style={{ fontSize: 12, color: colors.primary }}>
-                    Edit
+                    {t.profile.edit}
                   </Text>
                 </TouchableOpacity>
 
@@ -375,7 +375,7 @@ export default function ProfileScreen() {
                               { color: colors.textSecondary },
                             ]}
                           >
-                            {achievement.targetCount} regs.
+                            {achievement.targetCount} {t.achievements.regsAbbr}
                           </Text>
                         </TouchableOpacity>
                       );

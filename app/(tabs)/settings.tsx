@@ -132,7 +132,7 @@ export default function OptionsScreen() {
             const measurements = await repo.getMeasurements();
 
             if (measurements.length === 0) {
-                 Alert.alert(t.common.error, "No data to export");
+                 Alert.alert(t.common.error, t.settings.noDataToExport);
                  return;
             }
             
@@ -166,7 +166,7 @@ export default function OptionsScreen() {
             if (await Sharing.isAvailableAsync()) {
                 await Sharing.shareAsync(fileUri);
             } else {
-                Alert.alert(t.common.error, "Sharing is not available on this device");
+                Alert.alert(t.common.error, t.settings.sharingNotAvailable);
             }
 
         } catch (e: any) {
@@ -277,9 +277,9 @@ export default function OptionsScreen() {
                     {/* Theme Section */}
                     <Text style={[textStyle, { fontWeight: '600', marginBottom: 8 }]}>{t.settings.theme}</Text>
                     <View style={styles.themeRow}>
-                        <ThemeOption value="light" label="Light" />
-                        <ThemeOption value="dark" label="Dark" />
-                        <ThemeOption value="system" label="System" />
+                        <ThemeOption value="light" label={t.settings.themeLight} />
+                        <ThemeOption value="dark" label={t.settings.themeDark} />
+                        <ThemeOption value="system" label={t.settings.themeSystem} />
                     </View>
 
                     {/* Separator */}
@@ -327,14 +327,14 @@ export default function OptionsScreen() {
                     />
 
                      <Button 
-                        title="Reparar Fechas (Fix Dates)" 
+                        title={t.settings.fixDates}
                         onPress={async () => {
                             try {
                                 const repo = new MeasurementsRepository(db);
                                 const count = await repo.fixDateFormats();
-                                Alert.alert("Success", `Fixed ${count} date records.`);
+                                Alert.alert(t.common.success, `${count} ${t.settings.fixDatesSuccess}`);
                             } catch (e: any) {
-                                Alert.alert("Error", e.message);
+                                Alert.alert(t.common.error, e.message);
                             }
                         }} 
                         variant="outline"
@@ -367,7 +367,7 @@ export default function OptionsScreen() {
                                                     Alert.alert(t.common.success, t.settings.deletionSuccess);
                                                 } catch (e: any) {
                                                     console.error(e);
-                                                    Alert.alert(t.common.error, 'Failed to delete records');
+                                                    Alert.alert(t.common.error, t.settings.deleteError);
                                                 }
                                             }
                                         }
