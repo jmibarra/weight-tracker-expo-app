@@ -1,7 +1,7 @@
 import * as SQLite from 'expo-sqlite';
 
 export async function migrateDbIfNeeded(db: SQLite.SQLiteDatabase) {
-  const DATABASE_VERSION = 1;
+  const DATABASE_VERSION = 2;
   // Get user_version of the DB
   let { user_version: currentDbVersion } = await db.getFirstAsync<{ user_version: number }>(
     'PRAGMA user_version'
@@ -31,8 +31,16 @@ export async function migrateDbIfNeeded(db: SQLite.SQLiteDatabase) {
         created_at INTEGER NOT NULL
       );
     `);
-    
-    // Update version
-    await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
+    currentDbVersion = 1;
   }
+
+  // Migración v1 -> v2: Índice en columna date para optimizar queries
+  if (currentDbVersion === 1) {
+    await db.execAsync(`
+      CREATE INDEX IF NOT EXISTS idx_measurements_date ON measurements(date);
+    `);
+  }
+
+  // Actualizar versión de la base de datos
+  await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
 }
