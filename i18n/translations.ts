@@ -23,6 +23,7 @@ export const translations = {
       vsLastRecord: "vs last record",
       tabTitle: "Home",
       measurementsChartTitle: "Measurements Evolution",
+      addWeight: "Add Weight",
     },
     history: {
       title: "History",
@@ -200,6 +201,7 @@ export const translations = {
       vsLastRecord: "vs último registro",
       tabTitle: "Inicio",
       measurementsChartTitle: "Evolución de Medidas",
+      addWeight: "Añadir Peso",
     },
     history: {
       title: "Historial",

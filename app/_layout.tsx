@@ -9,6 +9,7 @@ import { MeasurementsRepository } from '@/db/repositories/MeasurementsRepository
 import { SettingsRepository } from '@/db/repositories/SettingsRepository';
 import { SETTINGS_KEYS } from '@/constants/SettingsKeys';
 import { I18nProvider } from '@/i18n/I18nContext';
+import { useI18n } from '@/i18n/I18nContext';
 import { SQLiteProvider, useSQLiteContext } from 'expo-sqlite';
 import { useEffect } from 'react';
 
@@ -24,6 +25,7 @@ export const unstable_settings = {
 function InnerLayout() {
     useQuickActionRouting();
     const { isDark } = useTheme();
+    const { t } = useI18n();
     const db = useSQLiteContext();
 
     useEffect(() => {
@@ -31,7 +33,7 @@ function InnerLayout() {
         QuickActions.setItems([
           {
             id: 'add-weight',
-            title: 'Añadir Peso',
+            title: t.home.addWeight,
             icon: 'add_weight_icon',
             params: { href: '/modal' },
           }
