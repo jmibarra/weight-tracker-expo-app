@@ -39,6 +39,7 @@ export default function HomeScreen() {
   const [targetWeight, setTargetWeight] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [range, setRange] = useState<"all" | "1Y" | "YTD" | "1M" | "1W">("1W");
+  const [chartPage, setChartPage] = useState(0);
   const [streaks, setStreaks] = useState<{
     currentStreak: number;
     longestStreak: number;
@@ -75,18 +76,25 @@ export default function HomeScreen() {
       (m) => m.waist || m.hip || m.legs,
     );
 
-    // Sampling for large datasets (prevent crash on 'all')
-    if (filtered.length > 50) {
-      const step = Math.ceil(filtered.length / 50);
-      filtered = filtered.filter(
-        (_, index) => index % step === 0 || index === filtered.length - 1,
-      );
+    // Pagination for large datasets
+    const PAGE_SIZE = 50;
+    let totalPages = Math.ceil(timeFiltered.length / PAGE_SIZE);
+    if (totalPages === 0) totalPages = 1;
+    const safePage = Math.min(chartPage, totalPages - 1);
+    
+    // Page 0 = newest data (end of array)
+    // Page 1 = older data, etc.
+    let paginated = timeFiltered;
+    if (timeFiltered.length > PAGE_SIZE) {
+      const end = timeFiltered.length - safePage * PAGE_SIZE;
+      const start = Math.max(0, end - PAGE_SIZE);
+      paginated = timeFiltered.slice(start, end);
     }
 
-    const lineData = filtered.map((m, index) => {
+    const lineData = paginated.map((m, index) => {
       const currentYear = m.date.slice(0, 4);
       const prevYear =
-        index > 0 ? filtered[index - 1].date.slice(0, 4) : currentYear;
+        index > 0 ? paginated[index - 1].date.slice(0, 4) : currentYear;
       const isYearChange = currentYear !== prevYear && range === "all";
 
       const day = m.date.slice(8, 10);
@@ -114,7 +122,7 @@ export default function HomeScreen() {
       };
     });
 
-    return { lineData, filteredRaw: filtered, measurementsData };
+    return { lineData, filteredRaw: paginated, measurementsData, totalPages, safePage };
   };
 
   // Memoizar para evitar recálculos en cada render
@@ -122,7 +130,9 @@ export default function HomeScreen() {
     lineData: filteredChartData,
     filteredRaw,
     measurementsData,
-  } = useMemo(() => getFilteredData(), [data, range, dateFormat, colors]);
+    totalPages,
+    safePage,
+  } = useMemo(() => getFilteredData(), [data, range, dateFormat, colors, chartPage]);
 
   // Simple Moving Average Calculation
   const calculateMovingAverage = (data: Measurement[], windowSize: number) => {
@@ -294,7 +304,10 @@ export default function HomeScreen() {
               {(["all", "1Y", "YTD", "1M", "1W"] as const).map((r) => (
                 <TouchableOpacity
                   key={r}
-                  onPress={() => setRange(r)}
+                  onPress={() => {
+                    setRange(r as any);
+                    setChartPage(0);
+                  }}
                   style={{
                     paddingVertical: 4,
                     paddingHorizontal: 8,
@@ -326,11 +339,36 @@ export default function HomeScreen() {
           </View>
 
           {filteredChartData.length > 0 ? (
-            <WeightChart
-              data={filteredChartData}
-              trendData={showTrendLine ? trendLineData : undefined}
-              targetWeight={targetWeight > 0 ? targetWeight : undefined}
-            />
+            <>
+              <WeightChart
+                data={filteredChartData}
+                trendData={showTrendLine ? trendLineData : undefined}
+                targetWeight={targetWeight > 0 ? targetWeight : undefined}
+              />
+              {totalPages > 1 && (
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', paddingHorizontal: 10, marginTop: 10 }}>
+                  <TouchableOpacity 
+                    disabled={safePage >= totalPages - 1} 
+                    onPress={() => setChartPage(p => p + 1)}
+                    style={{ padding: 8, opacity: safePage >= totalPages - 1 ? 0.3 : 1 }}
+                  >
+                    <MaterialCommunityIcons name="chevron-left" size={24} color={colors.text} />
+                  </TouchableOpacity>
+                  
+                  <Text style={{ color: colors.textSecondary, fontSize: 12 }}>
+                    {safePage + 1} / {totalPages}
+                  </Text>
+                  
+                  <TouchableOpacity 
+                    disabled={safePage === 0} 
+                    onPress={() => setChartPage(p => p - 1)}
+                    style={{ padding: 8, opacity: safePage === 0 ? 0.3 : 1 }}
+                  >
+                    <MaterialCommunityIcons name="chevron-right" size={24} color={colors.text} />
+                  </TouchableOpacity>
+                </View>
+              )}
+            </>
           ) : (
             <View
               style={{
