@@ -1,9 +1,10 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
-import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, RefreshControl, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Card } from '@/components/ui/Card';
+import { styles } from './history.styles';
 import { useTheme } from '@/context/ThemeContext';
 import { Measurement } from '@/db/repositories/MeasurementsRepository';
 import { useI18n } from '@/i18n/I18nContext';
@@ -107,43 +108,3 @@ export default function HistoryScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  list: {
-    padding: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginLeft: 20,
-    marginTop: 10,
-    marginBottom: 10,
-  },
-  itemCard: {
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    marginBottom: 12,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  date: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  weight: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  subtext: {
-    fontSize: 12,
-    marginTop: 2,
-  },
-  empty: {
-    textAlign: 'center',
-    marginTop: 40,
-  }
-});

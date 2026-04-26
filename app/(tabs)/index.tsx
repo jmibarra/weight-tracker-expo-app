@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { styles } from "./index.styles";
 import { MeasurementsChartModal } from "@/components/charts/MeasurementsChartModal";
 import { WeightChart } from "@/components/charts/WeightChart";
 import { StreaksSection } from "@/components/home/StreaksSection";
@@ -277,18 +278,8 @@ export default function HomeScreen() {
 
         {/* Chart Section */}
         <Card style={styles.chartCard}>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 16,
-              width: "100%",
-            }}
-          >
-            <View
-              style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
-            >
+          <View style={styles.chartHeader}>
+            <View style={styles.trendContainer}>
               <Text style={cardTitleStyle}>{t.home.trend}</Text>
               <TouchableOpacity
                 onPress={() => setMeasurementsModalVisible(true)}
@@ -300,7 +291,7 @@ export default function HomeScreen() {
                 />
               </TouchableOpacity>
             </View>
-            <View style={{ flexDirection: "row", gap: 6 }}>
+            <View style={styles.rangesContainer}>
               {(["all", "1Y", "YTD", "1M", "1W"] as const).map((r) => (
                 <TouchableOpacity
                   key={r}
@@ -308,20 +299,19 @@ export default function HomeScreen() {
                     setRange(r as any);
                     setChartPage(0);
                   }}
-                  style={{
-                    paddingVertical: 4,
-                    paddingHorizontal: 8,
-                    borderRadius: 16,
-                    backgroundColor:
-                      range === r ? colors.primary : colors.surfaceHighlight,
-                  }}
+                  style={[
+                    styles.rangeButton,
+                    {
+                      backgroundColor:
+                        range === r ? colors.primary : colors.surfaceHighlight,
+                    }
+                  ]}
                 >
                   <Text
-                    style={{
-                      color: range === r ? "#fff" : colors.textSecondary,
-                      fontSize: 10,
-                      fontWeight: "600",
-                    }}
+                    style={[
+                      styles.rangeText,
+                      { color: range === r ? "#fff" : colors.textSecondary }
+                    ]}
                   >
                     {
                       {
@@ -346,23 +336,23 @@ export default function HomeScreen() {
                 targetWeight={targetWeight > 0 ? targetWeight : undefined}
               />
               {totalPages > 1 && (
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', paddingHorizontal: 10, marginTop: 10 }}>
+                <View style={styles.paginationContainer}>
                   <TouchableOpacity 
                     disabled={safePage >= totalPages - 1} 
                     onPress={() => setChartPage(p => p + 1)}
-                    style={{ padding: 8, opacity: safePage >= totalPages - 1 ? 0.3 : 1 }}
+                    style={[styles.paginationButton, { opacity: safePage >= totalPages - 1 ? 0.3 : 1 }]}
                   >
                     <MaterialCommunityIcons name="chevron-left" size={24} color={colors.text} />
                   </TouchableOpacity>
                   
-                  <Text style={{ color: colors.textSecondary, fontSize: 12 }}>
+                  <Text style={[styles.paginationText, { color: colors.textSecondary }]}>
                     {safePage + 1} / {totalPages}
                   </Text>
                   
                   <TouchableOpacity 
                     disabled={safePage === 0} 
                     onPress={() => setChartPage(p => p - 1)}
-                    style={{ padding: 8, opacity: safePage === 0 ? 0.3 : 1 }}
+                    style={[styles.paginationButton, { opacity: safePage === 0 ? 0.3 : 1 }]}
                   >
                     <MaterialCommunityIcons name="chevron-right" size={24} color={colors.text} />
                   </TouchableOpacity>
@@ -370,14 +360,7 @@ export default function HomeScreen() {
               )}
             </>
           ) : (
-            <View
-              style={{
-                height: 180,
-                justifyContent: "center",
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
+            <View style={styles.emptyChartContainer}>
               <Text style={{ color: colors.textSecondary }}>
                 {t.home.noChartData}
               </Text>
@@ -501,74 +484,4 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  content: {
-    padding: 16,
-    paddingTop: 8,
-    paddingBottom: 20, // Add bottom padding to avoid tab bar overlap
-  },
-  headerTitle: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 12,
-  },
-  mainCard: {
-    marginBottom: 12,
-    padding: 16,
-  },
-  mainCardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  weightRow: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    gap: 10,
-  },
-  bigWeight: {
-    fontSize: 42,
-    fontWeight: "800",
-    lineHeight: 46,
-  },
-  bigUnit: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginLeft: 4,
-  },
-  badge: {
-    paddingVertical: 3,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-    alignSelf: "center",
-    marginBottom: 6,
-  },
-  badgeText: {
-    fontWeight: "800",
-    fontSize: 13,
-  },
-  chartCard: {
-    marginBottom: 12,
-    alignItems: "center",
-    padding: 12,
-    paddingLeft: 20,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8, // Tighter gap
-  },
-  gridCard: {
-    flex: 1,
-    minWidth: "30%", // Allow 3 columns (approx 30%)
-    padding: 5,
-    justifyContent: "center",
-    alignItems: "center", // Center align content for 3-col
-    height: 70,
-  },
-});
+
