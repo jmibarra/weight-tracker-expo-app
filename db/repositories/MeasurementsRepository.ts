@@ -71,6 +71,13 @@ export class MeasurementsRepository {
     );
   }
 
+  async getMeasurementByDate(date: string): Promise<Measurement | null> {
+    return await this.db.getFirstAsync<Measurement>(
+      `SELECT * FROM measurements WHERE date = ?`,
+      [date],
+    );
+  }
+
   async updateMeasurement(measurement: Measurement) {
     if (!measurement.id) throw new Error("ID required for update");
     const { id, date, weight, waist, hip, legs, bmi } = measurement;

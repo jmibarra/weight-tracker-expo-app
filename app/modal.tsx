@@ -202,81 +202,115 @@ export default function ModalScreen() {
     }
 
     setLoading(true);
-    try {
-      let bmi = 0;
-      if (userHeight) {
-        bmi = ImcCalculator.calculate(parseFloat(weight), userHeight);
-      }
+    const isoDate = toIsoDateString(date);
 
-      const data = {
-        date: toIsoDateString(date),
-        weight: parseFloat(weight),
-        waist: waist ? parseFloat(waist) : undefined,
-        hip: hip ? parseFloat(hip) : undefined,
-        legs: legs ? parseFloat(legs) : undefined,
-        bmi,
-      };
+    const performSave = async (targetEditId: number | null) => {
+      try {
+        let bmi = 0;
+        if (userHeight) {
+          bmi = ImcCalculator.calculate(parseFloat(weight), userHeight);
+        }
 
-      if (editId) {
-        await measurementsRepo.updateMeasurement({ ...data, id: editId });
-        router.back();
-      } else {
-        // Check for achievements BEFORE navigating back
-        await measurementsRepo.addMeasurement(data);
+        const data = {
+          date: isoDate,
+          weight: parseFloat(weight),
+          waist: waist ? parseFloat(waist) : undefined,
+          hip: hip ? parseFloat(hip) : undefined,
+          legs: legs ? parseFloat(legs) : undefined,
+          bmi,
+        };
 
-        // Get new data for checking
-        // We use check logic here.
-        const measurements = await measurementsRepo.getMeasurementsForChart();
-        let unlocked: Achievement | undefined;
+        if (targetEditId) {
+          await measurementsRepo.updateMeasurement({ ...data, id: targetEditId });
+          router.back();
+        } else {
+          // Check for achievements BEFORE navigating back
+          await measurementsRepo.addMeasurement(data);
 
-        // 1. Check Weight Loss (Priority)
-        if (measurements.length > 0) {
-          const startWeight = measurements[0].weight;
-          const currentIsoDate = toIsoDateString(date);
-          const addedWeight = parseFloat(weight);
+          // Get new data for checking
+          // We use check logic here.
+          const measurements = await measurementsRepo.getMeasurementsForChart();
+          let unlocked: Achievement | undefined;
 
-          // Find the entry we just added.
-          // Note: If multiple entries exist for same date/weight, we take the last one (most likely the new one or consistent).
-          // Actually, for "crossing" check, using the logical position in time is correct.
-          const currentIndex = measurements.findIndex(
-            (m) => m.date === currentIsoDate && m.weight === addedWeight,
-          );
+          // 1. Check Weight Loss (Priority)
+          if (measurements.length > 0) {
+            const startWeight = measurements[0].weight;
+            const currentIsoDate = isoDate;
+            const addedWeight = parseFloat(weight);
 
-          if (currentIndex >= 0) {
-            const currentLoss = startWeight - addedWeight;
-            let prevLoss = 0;
+            // Find the entry we just added.
+            // Note: If multiple entries exist for same date/weight, we take the last one (most likely the new one or consistent).
+            // Actually, for "crossing" check, using the logical position in time is correct.
+            const currentIndex = measurements.findIndex(
+              (m) => m.date === currentIsoDate && m.weight === addedWeight,
+            );
 
-            if (currentIndex > 0) {
-              const prevRecord = measurements[currentIndex - 1];
-              prevLoss = startWeight - prevRecord.weight;
+            if (currentIndex >= 0) {
+              const currentLoss = startWeight - addedWeight;
+              let prevLoss = 0;
+
+              if (currentIndex > 0) {
+                const prevRecord = measurements[currentIndex - 1];
+                prevLoss = startWeight - prevRecord.weight;
+              }
+
+              // Check if we CROSSED a threshold this time
+              unlocked = WEIGHT_LOSS_ACHIEVEMENTS.find(
+                (a) => prevLoss < a.targetCount && currentLoss >= a.targetCount,
+              );
             }
+          }
 
-            // Check if we CROSSED a threshold this time
-            unlocked = WEIGHT_LOSS_ACHIEVEMENTS.find(
-              (a) => prevLoss < a.targetCount && currentLoss >= a.targetCount,
+          // 2. Check Registry Count (if no weight loss unlock)
+          if (!unlocked) {
+            const newCount = measurements.length;
+            unlocked = REGISTRY_ACHIEVEMENTS.find(
+              (a) => a.targetCount === newCount,
             );
           }
-        }
 
-        // 2. Check Registry Count (if no weight loss unlock)
-        if (!unlocked) {
-          const newCount = measurements.length;
-          unlocked = REGISTRY_ACHIEVEMENTS.find(
-            (a) => a.targetCount === newCount,
-          );
+          if (unlocked) {
+            setUnlockedAchievement(unlocked);
+            setShowAchievementParams(true);
+          } else {
+            router.back();
+          }
         }
-
-        if (unlocked) {
-          setUnlockedAchievement(unlocked);
-          setShowAchievementParams(true);
-        } else {
-          router.back();
-        }
+      } catch (e) {
+        console.error(e);
+        Alert.alert(t.common.error, t.addEntry.error);
+      } finally {
+        setLoading(false);
       }
+    };
+
+    try {
+      const existingEntry = await measurementsRepo.getMeasurementByDate(isoDate);
+      
+      if (existingEntry && existingEntry.id !== editId) {
+        setLoading(false);
+        Alert.alert(
+          t.addEntry.duplicateTitle,
+          t.addEntry.duplicateMessage,
+          [
+            { text: t.addEntry.cancel, style: 'cancel' },
+            {
+              text: t.addEntry.overwrite,
+              style: 'destructive',
+              onPress: () => {
+                setLoading(true);
+                performSave(existingEntry.id || null);
+              }
+            }
+          ]
+        );
+        return;
+      }
+      
+      await performSave(editId);
     } catch (e) {
       console.error(e);
       Alert.alert(t.common.error, t.addEntry.error);
-    } finally {
       setLoading(false);
     }
   };

@@ -108,6 +108,9 @@ export const translations = {
       unsavedMessage: "You have unsaved changes. Are you sure you want to discard them?",
       discard: "Discard",
       keepEditing: "Keep Editing",
+      duplicateTitle: "Duplicate Entry",
+      duplicateMessage: "An entry for this date already exists. Do you want to overwrite it?",
+      overwrite: "Overwrite",
     },
     common: {
       error: "Error",
@@ -290,6 +293,9 @@ export const translations = {
       unsavedMessage: "Tienes cambios sin guardar. ¿Estás seguro de que quieres descartarlos?",
       discard: "Descartar",
       keepEditing: "Seguir editando",
+      duplicateTitle: "Entrada Duplicada",
+      duplicateMessage: "Ya existe un registro para esta fecha. ¿Deseas sobreescribirlo?",
+      overwrite: "Sobreescribir",
     },
     common: {
       error: "Error",
