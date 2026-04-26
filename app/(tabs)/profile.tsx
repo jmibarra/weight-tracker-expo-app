@@ -109,13 +109,11 @@ export default function ProfileScreen() {
   };
 
   const handleAchievementPress = (achievement: Achievement) => {
-    const isUnlocked = isAchievementUnlocked(achievement);
-    const title =
-      t.achievements[achievement.id as keyof typeof t.achievements]?.title ||
-      achievement.id;
-    const description =
-      t.achievements[achievement.id as keyof typeof t.achievements]
-        ?.description || "";
+    // Extraer la traducción del logro y verificar que sea un objeto (no un string plano)
+    const achievementTranslation = t.achievements[achievement.id as keyof typeof t.achievements];
+    const isTranslationObject = typeof achievementTranslation === 'object' && achievementTranslation !== null;
+    const title = isTranslationObject ? achievementTranslation.title : achievement.id;
+    const description = isTranslationObject ? achievementTranslation.description : "";
 
     const progressValue =
       achievement.type === "registry"
@@ -366,9 +364,10 @@ export default function ProfileScreen() {
                             ]}
                             numberOfLines={1}
                           >
-                            {t.achievements[
-                              achievement.id as keyof typeof t.achievements
-                            ]?.title || achievement.id}
+                            {(() => {
+                              const val = t.achievements[achievement.id as keyof typeof t.achievements];
+                              return typeof val === 'object' ? val.title : achievement.id;
+                            })()}
                           </Text>
                           <Text
                             style={[
@@ -444,9 +443,10 @@ export default function ProfileScreen() {
                             ]}
                             numberOfLines={1}
                           >
-                            {t.achievements[
-                              achievement.id as keyof typeof t.achievements
-                            ]?.title || achievement.id}
+                            {(() => {
+                              const val = t.achievements[achievement.id as keyof typeof t.achievements];
+                              return typeof val === 'object' ? val.title : achievement.id;
+                            })()}
                           </Text>
                           <Text
                             style={[
