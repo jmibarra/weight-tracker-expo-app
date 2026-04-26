@@ -30,6 +30,7 @@ import { MeasurementsRepository } from "@/db/repositories/MeasurementsRepository
 import { SettingsRepository } from "@/db/repositories/SettingsRepository";
 import { useI18n } from "@/i18n/I18nContext";
 import { ImcCalculator } from "@/services/ImcCalculator";
+import { SETTINGS_KEYS } from "@/constants/SettingsKeys";
 
 export default function ModalScreen() {
   const db = useSQLiteContext();
@@ -59,7 +60,7 @@ export default function ModalScreen() {
     const loadData = async () => {
       try {
         const settingsRepo = new SettingsRepository(db);
-        const h = await settingsRepo.getSetting("height");
+        const h = await settingsRepo.getSetting(SETTINGS_KEYS.HEIGHT);
         if (h) setUserHeight(parseFloat(h));
 
         if (params.id) {

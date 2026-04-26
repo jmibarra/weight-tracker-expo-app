@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/Colors';
+import { SETTINGS_KEYS } from '@/constants/SettingsKeys';
 import { SettingsRepository } from '@/db/repositories/SettingsRepository';
 import { useSQLiteContext } from 'expo-sqlite';
 import React, { createContext, useContext, useEffect, useState } from 'react';
@@ -25,7 +26,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const loadTheme = async () => {
         try {
             const repo = new SettingsRepository(db);
-            const savedTheme = await repo.getSetting('theme');
+            const savedTheme = await repo.getSetting(SETTINGS_KEYS.THEME);
             if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark' || savedTheme === 'system')) {
                 setThemeState(savedTheme as ThemeType);
             }
@@ -42,7 +43,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       setThemeState(newTheme);
       try {
           const repo = new SettingsRepository(db);
-          await repo.setSetting('theme', newTheme);
+          await repo.setSetting(SETTINGS_KEYS.THEME, newTheme);
       } catch (e) {
           console.error("Failed to save theme setting", e);
       }

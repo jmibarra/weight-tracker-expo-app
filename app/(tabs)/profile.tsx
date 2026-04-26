@@ -26,6 +26,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { MeasurementsRepository } from "@/db/repositories/MeasurementsRepository";
 import { SettingsRepository } from "@/db/repositories/SettingsRepository";
 import { useI18n } from "@/i18n/I18nContext";
+import { SETTINGS_KEYS } from "@/constants/SettingsKeys";
 
 export default function ProfileScreen() {
   const db = useSQLiteContext();
@@ -47,9 +48,9 @@ export default function ProfileScreen() {
       const loadSettings = async () => {
         try {
           const repo = new SettingsRepository(db);
-          const savedHeight = await repo.getSetting("height");
-          const savedSex = await repo.getSetting("sex");
-          const savedTarget = await repo.getSetting("targetWeight");
+          const savedHeight = await repo.getSetting(SETTINGS_KEYS.HEIGHT);
+          const savedSex = await repo.getSetting(SETTINGS_KEYS.SEX);
+          const savedTarget = await repo.getSetting(SETTINGS_KEYS.TARGET_WEIGHT);
 
           if (savedHeight) setHeight(savedHeight);
           if (savedSex) setSex(savedSex as "M" | "F");
@@ -84,10 +85,10 @@ export default function ProfileScreen() {
     setLoading(true);
     try {
       const repo = new SettingsRepository(db);
-      await repo.setSetting("height", height);
-      await repo.setSetting("sex", sex);
+      await repo.setSetting(SETTINGS_KEYS.HEIGHT, height);
+      await repo.setSetting(SETTINGS_KEYS.SEX, sex);
       if (targetWeight) {
-        await repo.setSetting("targetWeight", targetWeight);
+        await repo.setSetting(SETTINGS_KEYS.TARGET_WEIGHT, targetWeight);
       }
       Alert.alert(t.common.success, t.profile.success);
     } catch (e) {

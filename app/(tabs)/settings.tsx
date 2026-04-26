@@ -16,6 +16,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { MeasurementsRepository } from '@/db/repositories/MeasurementsRepository';
 import { SettingsRepository } from '@/db/repositories/SettingsRepository';
 import { useI18n } from '@/i18n/I18nContext';
+import { SETTINGS_KEYS } from '@/constants/SettingsKeys';
 
 export default function OptionsScreen() {
     const router = useRouter();
@@ -27,7 +28,7 @@ export default function OptionsScreen() {
     React.useEffect(() => {
         const loadSettings = async () => {
              const repo = new SettingsRepository(db);
-             const val = await repo.getSetting('showTrendLine');
+             const val = await repo.getSetting(SETTINGS_KEYS.SHOW_TREND_LINE);
              if (val !== null) {
                  setShowTrendLine(val === 'true');
              }
@@ -38,7 +39,7 @@ export default function OptionsScreen() {
     const toggleTrendLine = async (value: boolean) => {
         setShowTrendLine(value);
         const repo = new SettingsRepository(db);
-        await repo.setSetting('showTrendLine', String(value));
+        await repo.setSetting(SETTINGS_KEYS.SHOW_TREND_LINE, String(value));
     };
 
     const handleImportCsv = async () => {

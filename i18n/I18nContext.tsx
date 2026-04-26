@@ -1,3 +1,4 @@
+import { SETTINGS_KEYS } from '@/constants/SettingsKeys';
 import { SettingsRepository } from '@/db/repositories/SettingsRepository';
 import { useSQLiteContext } from 'expo-sqlite';
 import React, { createContext, useContext, useEffect, useState } from 'react';
@@ -25,8 +26,8 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     const loadSettings = async () => {
         try {
             const repo = new SettingsRepository(db);
-            const savedLocale = await repo.getSetting('language');
-            const savedDateFormat = await repo.getSetting('dateFormat');
+            const savedLocale = await repo.getSetting(SETTINGS_KEYS.LANGUAGE);
+            const savedDateFormat = await repo.getSetting(SETTINGS_KEYS.DATE_FORMAT);
 
             if (savedLocale && (savedLocale === 'en' || savedLocale === 'es')) {
                 setLocaleState(savedLocale as Locale);
@@ -50,7 +51,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     setLocaleState(newLocale);
     try {
         const repo = new SettingsRepository(db);
-        await repo.setSetting('language', newLocale);
+        await repo.setSetting(SETTINGS_KEYS.LANGUAGE, newLocale);
     } catch (e) {
         console.error(e);
     }
@@ -60,7 +61,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
       setDateFormatState(newFormat);
       try {
           const repo = new SettingsRepository(db);
-          await repo.setSetting('dateFormat', newFormat);
+          await repo.setSetting(SETTINGS_KEYS.DATE_FORMAT, newFormat);
       } catch (e) {
           console.error(e);
       }

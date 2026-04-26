@@ -23,6 +23,7 @@ import {
 } from "@/db/repositories/MeasurementsRepository";
 import { SettingsRepository } from "@/db/repositories/SettingsRepository";
 import { useI18n } from "@/i18n/I18nContext";
+import { SETTINGS_KEYS } from "@/constants/SettingsKeys";
 
 export default function HomeScreen() {
   const db = useSQLiteContext();
@@ -174,8 +175,8 @@ export default function HomeScreen() {
       const settingsRepo = new SettingsRepository(db);
 
       const measurements = await repo.getMeasurementsForChart(); // Ascending for chart
-      const target = await settingsRepo.getSetting("targetWeight");
-      const showTrend = await settingsRepo.getSetting("showTrendLine");
+      const target = await settingsRepo.getSetting(SETTINGS_KEYS.TARGET_WEIGHT);
+      const showTrend = await settingsRepo.getSetting(SETTINGS_KEYS.SHOW_TREND_LINE);
 
       if (target) setTargetWeight(parseFloat(target));
       if (showTrend !== null) setShowTrendLine(showTrend === "true");
