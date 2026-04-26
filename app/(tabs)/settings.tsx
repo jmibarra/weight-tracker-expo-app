@@ -326,20 +326,6 @@ export default function OptionsScreen() {
                         style={{marginTop: 16}}
                     />
 
-                     <Button 
-                        title={t.settings.fixDates}
-                        onPress={async () => {
-                            try {
-                                const repo = new MeasurementsRepository(db);
-                                const count = await repo.fixDateFormats();
-                                Alert.alert(t.common.success, `${count} ${t.settings.fixDatesSuccess}`);
-                            } catch (e: any) {
-                                Alert.alert(t.common.error, e.message);
-                            }
-                        }} 
-                        variant="outline"
-                        style={{marginTop: 16}}
-                    />
 
                     <Button 
                         title={t.settings.exportCsv} 
