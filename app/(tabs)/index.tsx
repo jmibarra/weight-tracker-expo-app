@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   RefreshControl,
   ScrollView,
@@ -116,11 +116,12 @@ export default function HomeScreen() {
     return { lineData, filteredRaw: filtered, measurementsData };
   };
 
+  // Memoizar para evitar recálculos en cada render
   const {
     lineData: filteredChartData,
     filteredRaw,
     measurementsData,
-  } = getFilteredData();
+  } = useMemo(() => getFilteredData(), [data, range, dateFormat, colors]);
 
   // Simple Moving Average Calculation
   const calculateMovingAverage = (data: Measurement[], windowSize: number) => {
@@ -150,18 +151,19 @@ export default function HomeScreen() {
     return maData;
   };
 
-  // Determine window size based on range
-  let windowSize = 0;
-  if (range === "1W") windowSize = 3;
-  if (range === "1M") windowSize = 5;
-  if (range === "YTD") windowSize = 6;
-  if (range === "1Y") windowSize = 7;
-  // 'all' -> 0 (no trend line requested/needed usually, or maybe 10?)
+  // Memoizar el cálculo de la línea de tendencia (media móvil)
+  const trendLineData = useMemo(() => {
+    let windowSize = 0;
+    if (range === "1W") windowSize = 3;
+    if (range === "1M") windowSize = 5;
+    if (range === "YTD") windowSize = 6;
+    if (range === "1Y") windowSize = 7;
+    // 'all' -> 0 (sin línea de tendencia)
 
-  const trendLineData =
-    windowSize > 0
+    return windowSize > 0
       ? calculateMovingAverage(filteredRaw, windowSize)
       : undefined;
+  }, [filteredRaw, range]);
 
   const [showTrendLine, setShowTrendLine] = useState(true);
 
