@@ -37,5 +37,15 @@ export const styles = StyleSheet.create({
   empty: {
     textAlign: 'center',
     marginTop: 40,
+  },
+  filterChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  filterText: {
+    fontSize: 14,
+    fontWeight: '600',
   }
 });
