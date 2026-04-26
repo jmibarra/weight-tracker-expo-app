@@ -130,7 +130,12 @@ export default function HistoryScreen() {
 
   const renderFilters = () => (
     <View style={{ marginBottom: 16 }}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 8, marginHorizontal: -20, paddingHorizontal: 20 }}>
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false} 
+        style={{ marginBottom: 8, marginHorizontal: -20 }}
+        contentContainerStyle={{ paddingHorizontal: 20 }}
+      >
         {availableYears.map(year => (
           <TouchableOpacity
             key={year}
@@ -151,7 +156,12 @@ export default function HistoryScreen() {
       </ScrollView>
 
       {selectedYear !== 'all' && availableMonths.length > 1 && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -20, paddingHorizontal: 20 }}>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false} 
+          style={{ marginHorizontal: -20 }}
+          contentContainerStyle={{ paddingHorizontal: 20 }}
+        >
           {availableMonths.map(month => (
             <TouchableOpacity
               key={month}
