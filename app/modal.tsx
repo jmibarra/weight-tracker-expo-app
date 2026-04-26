@@ -18,7 +18,7 @@ import {
 import { AchievementModal } from "@/components/AchievementModal";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { styles } from "./modal.styles";
+import { styles } from "@/styles/modal.styles";
 import { WeightPickerDialog } from "@/components/WeightPickerDialog";
 import {
   Achievement,

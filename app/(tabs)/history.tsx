@@ -4,7 +4,7 @@ import { FlatList, RefreshControl, Text, TouchableOpacity, View, ScrollView } fr
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Card } from '@/components/ui/Card';
-import { styles } from './history.styles';
+import { styles } from "@/styles/history.styles";
 import { useTheme } from '@/context/ThemeContext';
 import { Measurement } from '@/db/repositories/MeasurementsRepository';
 import { useI18n } from '@/i18n/I18nContext';

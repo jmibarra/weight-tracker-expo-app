@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { styles } from "./index.styles";
+import { styles } from "@/styles/index.styles";
 import { MeasurementsChartModal } from "@/components/charts/MeasurementsChartModal";
 import { WeightChart } from "@/components/charts/WeightChart";
 import { StreaksSection } from "@/components/home/StreaksSection";

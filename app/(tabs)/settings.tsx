@@ -11,7 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 import { Button } from "@/components/ui/Button";
-import { styles } from "./settings.styles";
+import { styles } from "@/styles/settings.styles";
 import { Card } from '@/components/ui/Card';
 import { useTheme } from '@/context/ThemeContext';
 import { useI18n } from '@/i18n/I18nContext';
