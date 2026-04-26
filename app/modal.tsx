@@ -1,7 +1,7 @@
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter, useNavigation } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import {
@@ -54,21 +54,43 @@ export default function ModalScreen() {
     useState<Achievement | null>(null);
   const [showAchievementParams, setShowAchievementParams] = useState(false);
 
+  const [initialValues, setInitialValues] = useState<{
+    weight: string;
+    waist: string;
+    hip: string;
+    legs: string;
+    date: string;
+  } | null>(null);
+
+  const navigation = useNavigation();
+
   useEffect(() => {
     const loadData = async () => {
       try {
         const h = await settingsRepo.getSetting(SETTINGS_KEYS.HEIGHT);
         if (h) setUserHeight(parseFloat(h));
 
+        let initialW = "70.0";
+        let initialWa = "";
+        let initialH = "";
+        let initialL = "";
+        let initialD = toIsoDateString(new Date());
+
         if (params.id) {
           const id = parseInt(params.id as string);
           setEditId(id);
           const m = await measurementsRepo.getMeasurementById(id);
           if (m) {
-            setWeight(m.weight.toString());
-            setWaist(m.waist ? m.waist.toString() : "");
-            setHip(m.hip ? m.hip.toString() : "");
-            setLegs(m.legs ? m.legs.toString() : "");
+            initialW = m.weight.toString();
+            initialWa = m.waist ? m.waist.toString() : "";
+            initialH = m.hip ? m.hip.toString() : "";
+            initialL = m.legs ? m.legs.toString() : "";
+            initialD = m.date;
+
+            setWeight(initialW);
+            setWaist(initialWa);
+            setHip(initialH);
+            setLegs(initialL);
 
             // Manually parse YYYY-MM-DD to avoid UTC timezone shifts
             const [year, month, day] = m.date.split("-").map(Number);
@@ -78,17 +100,58 @@ export default function ModalScreen() {
           // Create Mode: Init with latest weight or 70
           const latest = await measurementsRepo.getLatestMeasurement();
           if (latest) {
-            setWeight(latest.weight.toString());
-          } else {
-            setWeight("70.0");
+            initialW = latest.weight.toString();
           }
+          setWeight(initialW);
+          setDate(new Date());
         }
+
+        setInitialValues({
+          weight: initialW,
+          waist: initialWa,
+          hip: initialH,
+          legs: initialL,
+          date: initialD,
+        });
       } catch (e) {
         console.error(e);
       }
     };
     loadData();
   }, [params.id, measurementsRepo, settingsRepo]);
+
+  const hasUnsavedChanges = initialValues !== null && (
+    weight !== initialValues.weight ||
+    waist !== initialValues.waist ||
+    hip !== initialValues.hip ||
+    legs !== initialValues.legs ||
+    toIsoDateString(date) !== initialValues.date
+  );
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+      if (!hasUnsavedChanges || loading) {
+        return;
+      }
+
+      e.preventDefault();
+
+      Alert.alert(
+        t.addEntry.unsavedTitle,
+        t.addEntry.unsavedMessage,
+        [
+          { text: t.addEntry.keepEditing, style: 'cancel', onPress: () => {} },
+          {
+            text: t.addEntry.discard,
+            style: 'destructive',
+            onPress: () => navigation.dispatch(e.data.action),
+          },
+        ]
+      );
+    });
+
+    return unsubscribe;
+  }, [navigation, hasUnsavedChanges, loading, t]);
 
   const toIsoDateString = (d: Date) => {
     const year = d.getFullYear();

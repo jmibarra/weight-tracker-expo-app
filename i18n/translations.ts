@@ -104,6 +104,10 @@ export const translations = {
       error: "Failed to save entry",
       confirmDelete: "Are you sure you want to delete this entry?",
       selectWeight: "Select weight",
+      unsavedTitle: "Unsaved Changes",
+      unsavedMessage: "You have unsaved changes. Are you sure you want to discard them?",
+      discard: "Discard",
+      keepEditing: "Keep Editing",
     },
     common: {
       error: "Error",
@@ -282,6 +286,10 @@ export const translations = {
       error: "Error al guardar la entrada",
       confirmDelete: "¿Estás seguro de que quieres eliminar esta entrada?",
       selectWeight: "Seleccionar peso",
+      unsavedTitle: "Cambios sin guardar",
+      unsavedMessage: "Tienes cambios sin guardar. ¿Estás seguro de que quieres descartarlos?",
+      discard: "Descartar",
+      keepEditing: "Seguir editando",
     },
     common: {
       error: "Error",
