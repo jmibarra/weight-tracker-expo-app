@@ -99,7 +99,7 @@ export default function HistoryScreen() {
       <Text style={titleStyle}>{t.history.title}</Text>
       <FlatList
         data={data}
-        keyExtractor={item => item.id?.toString() || Math.random().toString()}
+        keyExtractor={(item, index) => item.id?.toString() || `item-${index}`}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
         refreshControl={<RefreshControl refreshing={loading} onRefresh={loadData} tintColor={colors.primary}/>}
