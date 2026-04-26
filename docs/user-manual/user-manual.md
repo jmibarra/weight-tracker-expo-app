@@ -30,6 +30,7 @@ El Dashboard es la pantalla principal en donde encontrarás un resumen veloz de 
 La gráfica principal es muy interactiva y es el corazón de la aplicación:
 - **Filtros de Tiempos:** Tienes diferentes atacheos temporales encima de la gráfica: **1W** (1 Semana), **1M** (1 Mes), **YTD** (Lo que va del año), **1A** (1 Año) y **Todos**. Al tocarlos enfocarás tus métricas justo en ese alcance.
 - **Línea Suavizada (Trend Line):** Por detrás del área coloreada de tu peso, podrás ver una línea punteada inteligente (una _moving average_) que elimina el ruido de las subidas o bajadas diarias producto de líquidos y te muestra la "tendencia real" donde va tu peso.
+- **Paginación Inteligente:** Cuando tengas mucha historia acumulada, en lugar de amontonar todos los datos, el gráfico te mostrará los registros agrupados por páginas, para que puedas navegar hacia el pasado o el futuro fácilmente mediante unas flechas (`<` y `>`) justo debajo del gráfico.
 - **Cambio de Año Automático:** Notarás que si navegas un horizonte de muchos años, aparecerá de vez en cuando una línea vertical marcando de forma clara por adelantado el cambio de período (Ej. "2024" -> "2025").
 
 ---
@@ -51,15 +52,27 @@ Para mantener el Dashboard limpio, la app incluye una **Pestaña de Métricas** 
 
 ---
 
-## ⚡ 6. Atajos (Quick Actions)
+## 📜 6. Historial y Filtros Dinámicos
 
-Si tienes mucha prisa y solo quieres sumar tu peso al levantarte:
-* Mantén presionado (**Long Press**) el ícono de **Weight Tracker** en el escritorio/pantalla de inicio de tu celular celular (iOS o Android).
-* Automáticamente se desplegará un menú rápido desde donde puedes seleccionar **"Añadir Peso"**. Al hacerlo la aplicación "saltará" directamente hasta la ventana requerida simplificando tu mañana.
+Todos tus registros se guardan con seguridad. En la pestaña **Historial** podrás ver absolutamente cada entrada registrada:
+* **Carruseles de Filtrado:** En la parte superior encontrarás selectores deslizables horizontalmente. Primero elige el **Año** y, si tienes mucha data en un año puntual, se habilitará automáticamente la selección por **Mes** (Ej. Filtrar solo los registros de _Febrero de 2024_).
+* **Diferencial de Peso:** Junto a cada registro verás en verde o rojo la diferencia de peso exacta contra el último pesaje, animándote a seguir tu progreso.
 
 ---
 
-## 💡 Trucos Rápidos
+## ⚡ 7. Atajos (Quick Actions) y Seguridad
+
+Si tienes mucha prisa y solo quieres sumar tu peso al levantarte:
+* Mantén presionado (**Long Press**) el ícono de **Weight Tracker** en el escritorio/pantalla de inicio de tu celular celular (iOS o Android).
+* Automáticamente se desplegará un menú rápido desde donde puedes seleccionar **"Añadir Peso"**.
+
+**Tus datos están protegidos contra descuidos:**
+* **Cambios no guardados:** Si empiezas a cargar un peso y cierras la ventana sin guardarlo por error, la aplicación te detendrá y pedirá confirmación para evitar que pierdas lo que anotaste.
+* **Prevención de duplicados:** Si te pesas dos veces el mismo día, te avisará que ya cuentas con un registro para esa fecha y te preguntará si estás seguro que quieres sobreescribirlo, evitando "ruido" en tus estadísticas.
+
+---
+
+## 💡 8. Trucos Rápidos
 * Para interactuar a fondo con un día puntual, mantén **presionada (Long Press)** en cualquier punto de los gráficos, ya sea peso o medidas, y podrás navegar deslizando tu dedo para conocer fechas intermedies puntuales.
 * La app recuerda en qué momento te quedaste, si te vas no temas perder lo cargado, y se recarga automáticamente. Tus datos persisten.
 

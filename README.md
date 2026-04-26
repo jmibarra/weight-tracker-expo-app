@@ -7,23 +7,27 @@ Una aplicación simple y elegante para el seguimiento de tu peso corporal, const
 - **Registro Diario**: Guarda tu peso y calculamos automáticamente tu IMC (Índice de Masa Corporal).
 - **Visualización de Progreso**: Gráficos interactivos para ver tu evolución en el tiempo:
   - Vistas por Semana, Mes, Año o Histórico completo.
-  - _Optimización_: La vista histórica utiliza muestreo inteligente para mostrar grandes volúmenes de datos con fluidez.
+  - **Paginación Inteligente**: La vista histórica navega fluidamente a través de grandes volúmenes de datos utilizando paginación nativa sin perder precisión.
 - **Estadísticas Clave**:
   - Peso Actual vs Peso Inicial.
   - Peso Máximo y Mínimo histórico.
   - Progreso total (diferencia de peso).
+- **Historial Completo**:
+  - Lista detallada con el historial de todos tus pesajes.
+  - **Filtros Dinámicos**: Aísla registros rápidamente mediante carruseles interactivos por Año y Mes.
 - **Métricas Avanzadas (Nueva Pestaña)**:
   - **Comparador de Periodos**: Visualiza variaciones absolutas y porcentuales comparando mes a mes o año a año tanto en peso como en medidas corporales.
   - **Tendencia Semanal**: Gráfico de barras inteligente para visualizar promedios semanales con colores dinámicos (verde si bajas, rojo si subes).
 - **Importación de Datos**:
   - Importa tu historial existente desde archivos CSV.
   - Soporte formato robusto incluyendo fechas y valores citados.
-- **Productividad**:
+- **Productividad y Seguridad**:
+  - **Validaciones Inteligentes**: Te avisa antes de sobreescribir pesajes duplicados del mismo día y pide confirmación si intentas salir sin guardar los cambios.
   - **Atajos Rápidos (Quick Actions)**: Mantén pulsado el icono de la app desde tu pantalla de inicio para acceder directamente a "Añadir Peso".
 - **Personalización**:
   - Modo Oscuro / Claro (Theme Aware).
   - Soporte multi-idioma (Español / Inglés).
-  - Configuración de Peso Objetivo.
+  - Configuración de Peso Objetivo y Formato de Fecha.
 
 ## 📸 Capturas de Pantalla
 
