@@ -332,7 +332,21 @@ export default function HomeScreen() {
             )}
 
             {/* Progress Bar */}
-            {targetWeight > 0 && data.length > 0 && (
+            {targetWeight > 0 && data.length > 0 && (() => {
+              // Cálculo de progreso reutilizable para texto y barra
+              const calculateProgress = () => {
+                const start = data[0].weight;
+                const current = latest.weight;
+                const target = targetWeight;
+                if (start === target) return 1;
+                let progress = start > target
+                  ? (start - current) / (start - target)
+                  : (current - start) / (target - start);
+                return Math.max(0, Math.min(1, progress));
+              };
+              const progress = calculateProgress();
+
+              return (
               <View
                 style={{
                   marginTop: 16,
@@ -364,20 +378,7 @@ export default function HomeScreen() {
                       fontWeight: "700",
                     }}
                   >
-                    {(() => {
-                      const start = data[0].weight;
-                      const current = latest.weight;
-                      const target = targetWeight;
-                      if (start === target) return "100%";
-                      let progress = 0;
-                      if (start > target) {
-                        progress = (start - current) / (start - target);
-                      } else {
-                        progress = (current - start) / (target - start);
-                      }
-                      progress = Math.max(0, Math.min(1, progress));
-                      return `${Math.round(progress * 100)}%`;
-                    })()}
+                    {`${Math.round(progress * 100)}%`}
                   </Text>
                 </View>
                 <View
@@ -393,25 +394,13 @@ export default function HomeScreen() {
                       height: "100%",
                       backgroundColor: colors.primary,
                       borderRadius: 4,
-                      width: (() => {
-                        const start = data[0].weight;
-                        const current = latest.weight;
-                        const target = targetWeight;
-                        if (start === target) return "100%";
-                        let progress = 0;
-                        if (start > target) {
-                          progress = (start - current) / (start - target);
-                        } else {
-                          progress = (current - start) / (target - start);
-                        }
-                        progress = Math.max(0, Math.min(1, progress));
-                        return `${progress * 100}%` as any;
-                      })(),
+                      width: `${progress * 100}%` as any,
                     }}
                   />
                 </View>
               </View>
-            )}
+              );
+            })()}
           </Card>
         ) : (
           !loading && (
