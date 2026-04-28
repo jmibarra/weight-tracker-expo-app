@@ -32,6 +32,9 @@ export const translations = {
       waistAbbr: "W:",
       hipAbbr: "H:",
       legsAbbr: "L:",
+      viewList: "List",
+      viewCalendar: "Calendar",
+      days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     },
     profile: {
       title: "Profile",
@@ -217,6 +220,9 @@ export const translations = {
       waistAbbr: "C:",
       hipAbbr: "Ca:",
       legsAbbr: "P:",
+      viewList: "Lista",
+      viewCalendar: "Calendario",
+      days: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
     },
     profile: {
       title: "Perfil",

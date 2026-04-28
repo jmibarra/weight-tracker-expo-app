@@ -1,9 +1,11 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useState, useMemo, useEffect } from 'react';
-import { FlatList, RefreshControl, Text, TouchableOpacity, View, ScrollView } from 'react-native';
+import { FlatList, RefreshControl, Text, TouchableOpacity, View, ScrollView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Picker } from '@react-native-picker/picker';
 
 import { Card } from '@/components/ui/Card';
+import { CalendarView } from '@/components/CalendarView';
 import { styles } from "@/styles/history.styles";
 import { useTheme } from '@/context/ThemeContext';
 import { Measurement } from '@/db/repositories/MeasurementsRepository';
@@ -20,6 +22,7 @@ export default function HistoryScreen() {
   const [loading, setLoading] = useState(false);
   const [selectedYear, setSelectedYear] = useState<string>('all');
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -56,13 +59,58 @@ export default function HistoryScreen() {
     }
   }, [selectedYear]);
 
+  useEffect(() => {
+    if (viewMode === 'calendar') {
+      const now = new Date();
+      if (selectedYear === 'all') {
+        setSelectedYear(now.getFullYear().toString());
+        const m = (now.getMonth() + 1).toString().padStart(2, '0');
+        setSelectedMonth(m);
+      } else if (selectedMonth === 'all') {
+        const m = (now.getMonth() + 1).toString().padStart(2, '0');
+        setSelectedMonth(m);
+      }
+    }
+  }, [viewMode, selectedYear, selectedMonth]);
+
+  const dataWithDiff = useMemo(() => {
+    return data.map((item, index) => {
+      const prevItem = data[index + 1];
+      let diff = 0;
+      if (prevItem) {
+        diff = item.weight - prevItem.weight;
+      }
+      return { ...item, diff };
+    });
+  }, [data]);
+
   const filteredData = useMemo(() => {
-    return data.filter(m => {
+    return dataWithDiff.filter(m => {
       const matchYear = selectedYear === 'all' || m.date.startsWith(selectedYear);
       const matchMonth = selectedMonth === 'all' || m.date.substring(5, 7) === selectedMonth;
       return matchYear && matchMonth;
     });
-  }, [data, selectedYear, selectedMonth]);
+  }, [dataWithDiff, selectedYear, selectedMonth]);
+
+  const calendarDaysData = useMemo(() => {
+    if (viewMode !== 'calendar' || selectedYear === 'all' || selectedMonth === 'all') return {};
+    
+    const map: Record<number, { weight: number, diff: number, id: number }> = {};
+    const prefix = `${selectedYear}-${selectedMonth}-`;
+    
+    // Iterate backwards so the earliest measurement of the day is kept, 
+    // or just the first encountered (latest) if we iterate forwards.
+    // The history is already sorted latest first, so first encountered is the latest of the day.
+    for (const item of dataWithDiff) {
+      if (item.date.startsWith(prefix)) {
+        const day = parseInt(item.date.substring(8, 10), 10);
+        if (!map[day]) {
+          map[day] = { weight: item.weight, diff: item.diff, id: item.id! };
+        }
+      }
+    }
+    return map;
+  }, [dataWithDiff, viewMode, selectedYear, selectedMonth]);
 
   // Dynamic Item Styles
   const dateStyle = { color: colors.text, ...styles.date };
@@ -130,69 +178,96 @@ export default function HistoryScreen() {
 
   const renderFilters = () => (
     <View style={{ marginBottom: 16 }}>
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false} 
-        style={{ marginBottom: 8, marginHorizontal: -20 }}
-        contentContainerStyle={{ paddingHorizontal: 20 }}
-      >
-        {availableYears.map(year => (
-          <TouchableOpacity
-            key={year}
-            onPress={() => {
-              setSelectedYear(year);
-              if (year === 'all') setSelectedMonth('all');
-            }}
-            style={[
-              styles.filterChip,
-              { backgroundColor: selectedYear === year ? colors.primary : colors.surfaceHighlight }
-            ]}
-          >
-            <Text style={[styles.filterText, { color: selectedYear === year ? '#fff' : colors.textSecondary }]}>
-              {year === 'all' ? t.home.ranges.all : year}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      {selectedYear !== 'all' && availableMonths.length > 1 && (
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false} 
-          style={{ marginHorizontal: -20 }}
-          contentContainerStyle={{ paddingHorizontal: 20 }}
+      <View style={[styles.toggleContainer, { backgroundColor: colors.surfaceHighlight }]}>
+        <TouchableOpacity 
+          style={[styles.toggleBtn, { backgroundColor: viewMode === 'list' ? colors.primary : 'transparent' }]}
+          onPress={() => setViewMode('list')}
         >
-          {availableMonths.map(month => (
-            <TouchableOpacity
-              key={month}
-              onPress={() => setSelectedMonth(month)}
-              style={[
-                styles.filterChip,
-                { backgroundColor: selectedMonth === month ? colors.primary : colors.surfaceHighlight }
-              ]}
+          <Text style={[styles.toggleBtnText, { color: viewMode === 'list' ? '#fff' : colors.textSecondary }]}>{t.history.viewList}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.toggleBtn, { backgroundColor: viewMode === 'calendar' ? colors.primary : 'transparent' }]}
+          onPress={() => setViewMode('calendar')}
+        >
+          <Text style={[styles.toggleBtnText, { color: viewMode === 'calendar' ? '#fff' : colors.textSecondary }]}>{t.history.viewCalendar}</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.pickerContainer}>
+        <View style={[styles.pickerWrapper, { borderColor: colors.border, backgroundColor: colors.surfaceHighlight }]}>
+          <Picker
+            selectedValue={selectedYear}
+            onValueChange={(itemValue) => {
+              setSelectedYear(itemValue);
+              if (itemValue === 'all') setSelectedMonth('all');
+            }}
+            mode="dropdown"
+            style={{ color: colors.text }}
+            dropdownIconColor={colors.text}
+          >
+            {availableYears.map(year => (
+              <Picker.Item 
+                key={year} 
+                label={year === 'all' ? t.home.ranges.all : year} 
+                value={year} 
+                color={Platform.OS === 'ios' ? colors.text : undefined}
+              />
+            ))}
+          </Picker>
+        </View>
+
+        {selectedYear !== 'all' && availableMonths.length > 1 && (
+          <View style={[styles.pickerWrapper, { borderColor: colors.border, backgroundColor: colors.surfaceHighlight }]}>
+            <Picker
+              selectedValue={selectedMonth}
+              onValueChange={(itemValue) => setSelectedMonth(itemValue)}
+              mode="dropdown"
+              style={{ color: colors.text }}
+              dropdownIconColor={colors.text}
             >
-              <Text style={[styles.filterText, { color: selectedMonth === month ? '#fff' : colors.textSecondary, textTransform: 'capitalize' }]}>
-                {getMonthName(month)}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      )}
+              {availableMonths.map(month => (
+                <Picker.Item 
+                  key={month} 
+                  label={month === 'all' ? t.home.ranges.all : (getMonthName(month).charAt(0).toUpperCase() + getMonthName(month).slice(1))} 
+                  value={month} 
+                  color={Platform.OS === 'ios' ? colors.text : undefined}
+                />
+              ))}
+            </Picker>
+          </View>
+        )}
+      </View>
     </View>
   );
 
   return (
     <SafeAreaView style={containerStyle} edges={['top']}>
       <Text style={titleStyle}>{t.history.title}</Text>
-      <FlatList
-        data={filteredData}
-        keyExtractor={(item, index) => item.id?.toString() || `item-${index}`}
-        renderItem={renderItem}
-        ListHeaderComponent={renderFilters}
-        contentContainerStyle={styles.list}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={loadData} tintColor={colors.primary}/>}
-        ListEmptyComponent={<Text style={emptyStyle}>{t.history.empty}</Text>}
-      />
+      
+      {viewMode === 'calendar' ? (
+        <ScrollView refreshControl={<RefreshControl refreshing={loading} onRefresh={loadData} tintColor={colors.primary}/>}>
+          {renderFilters()}
+          {selectedYear !== 'all' && selectedMonth !== 'all' ? (
+             <CalendarView 
+                year={parseInt(selectedYear, 10)} 
+                month={parseInt(selectedMonth, 10)} 
+                daysData={calendarDaysData} 
+             />
+          ) : (
+            <Text style={emptyStyle}>{t.history.empty}</Text>
+          )}
+        </ScrollView>
+      ) : (
+        <FlatList
+          data={filteredData}
+          keyExtractor={(item, index) => item.id?.toString() || `item-${index}`}
+          renderItem={renderItem}
+          ListHeaderComponent={renderFilters}
+          contentContainerStyle={styles.list}
+          refreshControl={<RefreshControl refreshing={loading} onRefresh={loadData} tintColor={colors.primary}/>}
+          ListEmptyComponent={<Text style={emptyStyle}>{t.history.empty}</Text>}
+        />
+      )}
     </SafeAreaView>
   );
 }
