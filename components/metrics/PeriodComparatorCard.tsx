@@ -100,13 +100,13 @@ export const PeriodComparatorCard = ({ measurements }: PeriodComparatorCardProps
                 style={[styles.toggleBtn, periodType === 'month' && { backgroundColor: colors.primary }]}
                 onPress={() => { setPeriodType('month'); setOffset(0); }}
             >
-                <Text style={[styles.toggleText, { color: periodType === 'month' ? '#fff' : colors.textSecondary }]}>1M</Text>
+                <Text style={[styles.toggleText, { color: periodType === 'month' ? '#fff' : colors.textSecondary }]}>{t.home.ranges.month}</Text>
             </TouchableOpacity>
             <TouchableOpacity 
                 style={[styles.toggleBtn, periodType === 'year' && { backgroundColor: colors.primary }]}
                 onPress={() => { setPeriodType('year'); setOffset(0); }}
             >
-                <Text style={[styles.toggleText, { color: periodType === 'year' ? '#fff' : colors.textSecondary }]}>1Y</Text>
+                <Text style={[styles.toggleText, { color: periodType === 'year' ? '#fff' : colors.textSecondary }]}>{t.home.ranges.year}</Text>
             </TouchableOpacity>
         </View>
       </View>

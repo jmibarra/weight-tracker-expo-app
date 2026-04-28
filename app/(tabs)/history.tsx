@@ -134,12 +134,23 @@ export default function HistoryScreen() {
         }
     }
 
+    // Calculate day of the week
+    const dateParts = item.date.split('-');
+    let dayOfWeekStr = '';
+    if (dateParts.length === 3) {
+      const d = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+      let dayIndex = d.getDay();
+      dayIndex = dayIndex === 0 ? 6 : dayIndex - 1; // 0 = Mon, 6 = Sun
+      const days = t.history.days || ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+      dayOfWeekStr = days[dayIndex] + ', ';
+    }
+
     return (
         <TouchableOpacity onPress={() => router.push({ pathname: '/modal', params: { id: item.id } })}>
         <Card style={styles.itemCard}>
             <View style={styles.row}>
                 <View>
-                    <Text style={dateStyle}>{formatDate(item.date)}</Text>
+                    <Text style={dateStyle}>{dayOfWeekStr}{formatDate(item.date)}</Text>
                     {item.bmi ? <Text style={subtextStyle}>{t.home.bmi}: {item.bmi}</Text> : null}
                 </View>
                 <View style={{alignItems: 'flex-end'}}>

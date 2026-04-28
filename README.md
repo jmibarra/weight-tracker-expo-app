@@ -31,9 +31,9 @@ Una aplicación simple y elegante para el seguimiento de tu peso corporal, const
 
 ## 📸 Capturas de Pantalla
 
-|                              Grafico principal                              |                                 Histórico                                 |                                     Perfil                                      |                                 Opciones                                 |
-| :-------------------------------------------------------------------------: | :-----------------------------------------------------------------------: | :-----------------------------------------------------------------------------: | :----------------------------------------------------------------------: |
-| <img src="assets/images/app-screenshots/main_screen_new.jpg" width="180" /> | <img src="assets/images/app-screenshots/historic_data.jpg" width="180" /> | <img src="assets/images/app-screenshots/profile_section_new.jpg" width="180" /> | <img src="assets/images/app-screenshots/options_menu.jpg" width="180" /> |
+|                              Grafico principal                              |                                 Histórico                                 |                           Histórico Calendario                            |                                   Perfil                                    |                                 Opciones                                 |
+| :-------------------------------------------------------------------------: | :-----------------------------------------------------------------------: | :-----------------------------------------------------------------------: | :-------------------------------------------------------------------------: | :----------------------------------------------------------------------: |
+| <img src="assets/images/app-screenshots/main_screen_new.jpg" width="180" /> | <img src="assets/images/app-screenshots/historic_data.jpg" width="180" /> | <img src="assets/images/app-screenshots/historic_data_cal.jpg" width="180" /> | <img src="assets/images/app-screenshots/profile_section.jpg" width="180" /> | <img src="assets/images/app-screenshots/options_menu.jpg" width="180" /> |
 
 _(Vistas principales de la aplicación: Inicio, Histórico Completo, Perfil y Configuración)_
 
@@ -41,31 +41,30 @@ _(Vistas principales de la aplicación: Inicio, Histórico Completo, Perfil y Co
 
 Sigue estos pasos para ejecutar el proyecto en tu máquina:
 
-1.  **Prerrequisitos**:
-
+1. **Prerrequisitos**:
     - Tener instalado [Node.js](https://nodejs.org/) (LTS recomendado).
     - Tener instalado `git`.
 
-2.  **Clonar el repositorio**:
+2. **Clonar el repositorio**:
 
     ```bash
     git clone https://github.com/jmibarra/weight-tracker-expo-app.git
     cd weight-tracker-expo-app
     ```
 
-3.  **Instalar dependencias**:
+3. **Instalar dependencias**:
 
     ```bash
     npm install
     ```
 
-4.  **Iniciar la aplicación**:
+4. **Iniciar la aplicación**:
 
     ```bash
     npx expo start
     ```
 
-5.  **Ejecutar en tu dispositivo**:
+5. **Ejecutar en tu dispositivo**:
     - **Físico**: Descarga la app **Expo Go** (Play Store / App Store) y escanea el código QR que muestra la terminal.
     - **Emulador**: Presiona `a` para Android o `i` para iOS (requiere configuración previa de Android Studio / Xcode).
 
@@ -89,11 +88,11 @@ Si encuentras algún error o tienes una idea para mejorar el libro, abre un **Is
 
 ### Proceso de Colaboración (Pull Requests)
 
-1.  **Haz un _Fork_** del repositorio.
-2.  **Crea una rama** para tu funcionalidad o corrección (`git checkout -b feature/MiNuevaMejora`).
-3.  **Realiza tus cambios** y haz _commit_ con un mensaje descriptivo.
-4.  **Sube tu rama** a tu _fork_ (`git push origin feature/MiNuevaMejora`).
-5.  **Abre un _Pull Request_** (PR) detallando los cambios que has realizado y por qué son necesarios.
+1. **Haz un _Fork_** del repositorio.
+2. **Crea una rama** para tu funcionalidad o corrección (`git checkout -b feature/MiNuevaMejora`).
+3. **Realiza tus cambios** y haz _commit_ con un mensaje descriptivo.
+4. **Sube tu rama** a tu _fork_ (`git push origin feature/MiNuevaMejora`).
+5. **Abre un _Pull Request_** (PR) detallando los cambios que has realizado y por qué son necesarios.
 
 ---
 

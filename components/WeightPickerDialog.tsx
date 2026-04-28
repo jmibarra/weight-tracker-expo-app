@@ -114,10 +114,10 @@ export function WeightPickerDialog({
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity onPress={onClose} style={styles.button}>
-                <Text style={[styles.buttonText, { color: colors.text }]}>CANCELAR</Text>
+                <Text style={[styles.buttonText, { color: colors.text }]}>{t.addEntry.cancel.toUpperCase()}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleSave} style={styles.button}>
-                <Text style={[styles.buttonText, { color: colors.text, fontWeight: 'bold' }]}>HECHO</Text>
+                <Text style={[styles.buttonText, { color: colors.text, fontWeight: 'bold' }]}>{t.common.done.toUpperCase()}</Text>
             </TouchableOpacity>
           </View>
 

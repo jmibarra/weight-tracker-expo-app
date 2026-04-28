@@ -1,4 +1,5 @@
 import { useTheme } from "@/context/ThemeContext";
+import { useI18n } from '@/i18n/I18nContext';
 import React from "react";
 import { Dimensions, View, Text } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
@@ -12,12 +13,13 @@ interface WeeklyBarChartProps {
 
 export const WeeklyBarChart = ({ data, title, noDataText }: WeeklyBarChartProps) => {
   const { colors } = useTheme();
+  const { t } = useI18n();
   const screenWidth = Dimensions.get("window").width;
 
   if (data.length === 0) {
     return (
       <View style={{ height: 250, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{ color: colors.textSecondary }}>{noDataText || "No data"}</Text>
+        <Text style={{ color: colors.textSecondary }}>{noDataText || t.metrics.noData}</Text>
       </View>
     );
   }

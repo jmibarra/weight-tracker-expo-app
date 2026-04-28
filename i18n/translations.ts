@@ -121,6 +121,7 @@ export const translations = {
       congratulations: "Congratulations!",
       continue: "Continue",
       ok: "OK",
+      done: "Done",
     },
     achievements: {
       records_1: {
@@ -309,6 +310,7 @@ export const translations = {
       congratulations: "¡Felicidades!",
       continue: "Continuar",
       ok: "OK",
+      done: "Hecho",
     },
     achievements: {
       records_1: {
