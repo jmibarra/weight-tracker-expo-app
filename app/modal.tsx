@@ -3,7 +3,7 @@ import DateTimePicker, {
 } from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useRouter, useNavigation } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -64,6 +64,7 @@ export default function ModalScreen() {
   } | null>(null);
 
   const navigation = useNavigation();
+  const isSavingRef = useRef(false);
 
   const toIsoDateString = (d: Date) => {
     const year = d.getFullYear();
@@ -138,7 +139,7 @@ export default function ModalScreen() {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', (e) => {
-      if (!hasUnsavedChanges || loading) {
+      if (!hasUnsavedChanges || loading || isSavingRef.current) {
         return;
       }
 
@@ -185,6 +186,7 @@ export default function ModalScreen() {
           try {
             setLoading(true);
             await measurementsRepo.deleteMeasurement(editId);
+            isSavingRef.current = true;
             router.back();
           } catch (e) {
             Alert.alert(t.common.error, String(e));
@@ -223,6 +225,7 @@ export default function ModalScreen() {
 
         if (targetEditId) {
           await measurementsRepo.updateMeasurement({ ...data, id: targetEditId });
+          isSavingRef.current = true;
           router.back();
         } else {
           // Check for achievements BEFORE navigating back
@@ -274,6 +277,7 @@ export default function ModalScreen() {
             setUnlockedAchievement(unlocked);
             setShowAchievementParams(true);
           } else {
+            isSavingRef.current = true;
             router.back();
           }
         }
@@ -318,6 +322,7 @@ export default function ModalScreen() {
 
   const handleAchievementClose = () => {
     setShowAchievementParams(false);
+    isSavingRef.current = true;
     router.back();
   };
 
